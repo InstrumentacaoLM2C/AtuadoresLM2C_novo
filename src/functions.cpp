@@ -126,10 +126,10 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int distancia1,
     motor2->enableOutputs();  // Ativa os motores
 
     if (direcao.equals("C")) {  // Se direção for "C"
-        posicaoDesejada1 = posicaoInicial1 + distancia1;  // Motor 1 avança
+        posicaoDesejada1 = posicaoInicial1 - distancia1;  // Motor 1 avança
         posicaoDesejada2 = posicaoInicial2 - distancia2;  // Motor 2 recua
     } else if (direcao.equals("B")) {  // Se direção for "B"
-        posicaoDesejada1 = posicaoInicial1 - distancia1;  // Motor 1 recua
+        posicaoDesejada1 = posicaoInicial1 + distancia1;  // Motor 1 recua
         posicaoDesejada2 = posicaoInicial2 + distancia2;  // Motor 2 avança
     } else {
         return; // Se direção inválida, sai da função
