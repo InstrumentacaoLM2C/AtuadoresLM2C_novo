@@ -12,7 +12,7 @@
 
 // Defina os pinos de controle do segundo motor
 #define PIN_PASSO_2 PB6  // Pino de passo (STEP) do Motor 2
-#define PIN_DIR_2 PB7   // Pino de direção (DIR) do Motor 2
+#define PIN_DIR_2 PB9   // Pino de direção (DIR) do Motor 2
 #define PIN_ENABLE_2 PB8  // Pino de ENABLE do Motor 2
 
 

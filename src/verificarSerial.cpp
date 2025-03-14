@@ -75,7 +75,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
               direcaoMotor = -1;
             }else if(motor == MOTORES_SIMULTANEOS) {
               direcao1 = 1;
-              direcao2 = 1;
+              direcao2 = -1;
             }
           break;
     
@@ -365,6 +365,8 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             String direcao = x.substring(fourthSeparatorIndex + 1, fifthSeparatorIndex); // "caracter B ou C"
             String mover = x.substring(fifthSeparatorIndex + 1); // "caracter H ou x"
 
+            Serial.print("Direção do motor: (case)" + direcao);
+
             digitalWrite(PIN_ENABLE_1, 1);
             digitalWrite(PIN_ENABLE_2, 1);
 
@@ -384,7 +386,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
               direcao2 = -1;
             }*/
 
-            if(mover == "H"){
+            if(mover.equals("H")){
               moverSimultaneo(motor1, motor2, qtdPulsosMotores1, qtdPulsosMotores2, velocidadeMaxima1, velocidadeMaxima2, direcao);
             }
 

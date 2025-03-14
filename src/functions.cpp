@@ -108,9 +108,10 @@ void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int dire
 
 
 void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int distancia1, int distancia2, int velocidadeMaxima1, int velocidadeMaxima2, String direcao) {
-    Serial.println("A direção que o motor irá se mover é: " + direcao);
-    
-    if (!motor1 || !motor2) return;
+    // Verifica se os motores são válidos
+    if ((!motor1) || (!motor2)) {
+        return;
+    }
 
     long posicaoInicial1 = motor1->currentPosition();
     long posicaoInicial2 = motor2->currentPosition();
@@ -118,69 +119,71 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int distancia1,
 
     pararMotorSimultaneo = false;
 
-    motor1->setMaxSpeed(abs(velocidadeMaxima1));
-    motor2->setMaxSpeed(abs(velocidadeMaxima2));
+    motor1->setMaxSpeed(abs(velocidadeMaxima1));  // Define a velocidade máxima
+    motor2->setMaxSpeed(abs(velocidadeMaxima2));  // Define a velocidade máxima
 
-    motor1->enableOutputs();
-    motor2->enableOutputs();
+    motor1->enableOutputs();  // Ativa os motores
+    motor2->enableOutputs();  // Ativa os motores
 
-    // Removendo espaços extras e caracteres de quebra de linha
-    direcao.trim();
-
-    if (direcao.equals("C")) {
-        motor1->setSpeed(abs(velocidadeMaxima1));
-        motor2->setSpeed(-abs(velocidadeMaxima2));
-        posicaoDesejada1 = posicaoInicial1 + distancia1;
-        posicaoDesejada2 = posicaoInicial2 - distancia2;
-    } else if (direcao.equals("B")) {
-        motor1->setSpeed(-abs(velocidadeMaxima1));
-        motor2->setSpeed(abs(velocidadeMaxima2));
-        posicaoDesejada1 = posicaoInicial1 - distancia1;
-        posicaoDesejada2 = posicaoInicial2 + distancia2;
+    if (direcao.equals("C")) {  // Se direção for "C"
+        posicaoDesejada1 = posicaoInicial1 + distancia1;  // Motor 1 avança
+        posicaoDesejada2 = posicaoInicial2 - distancia2;  // Motor 2 recua
+    } else if (direcao.equals("B")) {  // Se direção for "B"
+        posicaoDesejada1 = posicaoInicial1 - distancia1;  // Motor 1 recua
+        posicaoDesejada2 = posicaoInicial2 + distancia2;  // Motor 2 avança
     } else {
-        Serial.println("Erro: Direção inválida!");
-        return;
+        return; // Se direção inválida, sai da função
     }
 
-    motor1->setAcceleration(5000);
-    motor2->setAcceleration(5000);
+    motor1->setAcceleration(5000);  // Define aceleração
+    motor2->setAcceleration(5000);  // Define aceleração
 
-    motor1->moveTo(posicaoDesejada1);
-    motor2->moveTo(posicaoDesejada2);
+    motor1->moveTo(posicaoDesejada1);  // Move motor 1 para a posição desejada
+    motor2->moveTo(posicaoDesejada2);  // Move motor 2 para a posição desejada
 
     Serial.println("Movendo motores...");
 
-    while (motor1->distanceToGo() != 0 || motor2->distanceToGo() != 0) {
-        if (pararMotorSimultaneo) break;
-        
+    // Loop para mover os motores até que ambos atinjam suas posições desejadas
+    while ((motor1->distanceToGo() != 0 || motor2->distanceToGo() != 0)) {
+        if (pararMotorSimultaneo) {
+            Serial.println("Parando motores...");
+            break;
+        }
+
+        // Verifica se há comandos de parada
         if (Serial.available()) {
             char comando = Serial.read();
             if (comando == 'n') {
                 pararMotorSimultaneo = true;
+                Serial.println("Comando de parada recebido!");
                 break;
             }
         }
 
-        motor1->run();
-        motor2->run();
+        motor1->run();  // Executa o movimento do motor 1
+        motor2->run();  // Executa o movimento do motor 2
     }
 
+    // Para os motores ao terminar o movimento
+    motor1->stop();
+    motor2->stop();
+
+    // Zera as acelerações e as velocidades
     motor1->setAcceleration(0);
     motor2->setAcceleration(0);
-
     motor1->setSpeed(0);
     motor2->setSpeed(0);
 
+    // Reseta a posição dos motores
     motor1->setCurrentPosition(0);
     motor2->setCurrentPosition(0);
 
+    // Desativa os motores após o movimento
     motor1->disableOutputs();
     motor2->disableOutputs();
 
     Serial.println("y");
 }
-
-
 
 void calibracao(){}
 
@@ -198,6 +201,7 @@ void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
 
     motor1->disableOutputs(); 
     motor2->disableOutputs();
+
 
 }
 
