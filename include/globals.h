@@ -2,6 +2,6 @@
 #define GLOBALS_H
 
 // Declara a variável global como extern
-extern bool pararMotores;
+extern bool pararMotorSimultaneo, pararMotor;
 
 #endif

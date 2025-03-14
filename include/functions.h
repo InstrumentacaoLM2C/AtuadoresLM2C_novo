@@ -18,9 +18,9 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
 
 void moverMotor();
 
-void moverAcelerado(AccelStepper* motor, long distancia, int velocidadeMaxima);
+void moverAcelerado(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao);
 
-void moverUniforme(AccelStepper* motor, long distancia, int velocidadeMaxima);
+void moverUniforme(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao);
 
 void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int distancia1, int distancia2, int velocidadeMaxima1, int velocidadeMaxima2, String direcao);
 

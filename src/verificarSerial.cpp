@@ -20,6 +20,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
     int motor = 1;
     int direcao1 = 1;
     int direcao2 = -1;
+    int direcaoMotor = 1;
 
     if(Serial.available()){
         String data = Serial.readStringUntil('#');
@@ -66,10 +67,12 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             if(motor == MOTOR_1){
               //Serial.println("c"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
               direcao1 = -1;
+              direcaoMotor = 1;
             }
             else if(motor == MOTOR_2){
               //Serial.println("C"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
               direcao2 = -1;
+              direcaoMotor = 1;
             }else if(motor == MOTORES_SIMULTANEOS) {
               direcao1 = -1;
               direcao2 = 1;
@@ -81,10 +84,12 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             if(motor == MOTOR_1){
               //Serial.println(DIRECAO_MOTOR_1_BAIXO); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
               direcao1 = 1;
+              direcaoMotor = -1;
             }
             else if(motor == MOTOR_2){
               //Serial.println(DIRECAO_MOTOR_2_BAIXO); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
               direcao2 = 1;
+              direcaoMotor = -1;
             }else if(motor == MOTORES_SIMULTANEOS){
               direcao1 = 1;
               direcao2 = -1;
@@ -111,11 +116,11 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
           case ACELERAR_MOTOR:     //First character is an G = motor accelerates
             if(motor == '1'){
               //Serial.println("a"); // Printa a mensagem no aplicativo do vs code:: O motor 1 está se movendo com aceleração!
-              moverAcelerado(motor1, qtdPulsosMotor1, velocidadeMaxima);
+              moverAcelerado(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor);
             }
             else if(motor == '2'){
               //Serial.println("A"); // Printa a mensagem no aplicativo do vs code: O motor 2 está se movendo com aceleração!
-              moverAcelerado(motor2, qtdPulsosMotor2, velocidadeMaxima);
+              moverAcelerado(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor);
             }
     
           
@@ -148,12 +153,12 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
           case ATIVAR_MOTOR_VEL_CTE :     //First character is an H = motor spins with constant speed
             if(motor == '1'){
               //Serial.println("/O motor 1 se move com velocidade constante!");
-              moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima);
+              moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor);
               
             }
             else if(motor == '2'){
               //Serial.println("/O motor 2 se move com velocidade constante!");
-              moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima);
+              moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor);
     
             }
           break;
@@ -294,13 +299,15 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
               if(direcao == "B"){
                 //Serial.println("b"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
                 direcao1 = 1;
+                direcaoMotor = 1;
               }
               else if(direcao == "C"){
-                  //Serial.println("c"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
-                  direcao1 = -1;
+                //Serial.println("c"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
+                direcao1 = -1;
+                direcaoMotor = -1;
               }
               if(mover == "H"){
-                moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima);
+                moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor);
               }
     
               
@@ -319,13 +326,15 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
               if(direcao == "B"){
                 //Serial.println("B"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
                 direcao2 = 1;
+                direcaoMotor = 1;
               }
               else if(direcao == "C"){
                   //Serial.println("C"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
-                 direcao2 = -1;
+                direcao2 = -1;
+                direcaoMotor = -1;
               }
               if(mover == "H"){
-                moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima);
+                moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor);
               }
               
             }
