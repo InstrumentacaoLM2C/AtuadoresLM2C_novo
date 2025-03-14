@@ -8,6 +8,8 @@ int ConfigurarMotor (AccelStepper* numeroMotor, int velocidadeMaximaMotor, int a
 // Função para criar um motor
 AccelStepper* CriarMotor(int stepPin, int dirPin, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade);
 
+void ConfigurarMotor(AccelStepper* motor, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade);
+
 // Função para mover um motor
 int MoverMotor(AccelStepper* motor, long distancia);
 

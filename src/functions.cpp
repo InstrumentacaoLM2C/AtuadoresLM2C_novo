@@ -8,17 +8,27 @@ bool pararMotorSimultaneo, pararMotor = false;
 AccelStepper* CriarMotor(int stepPin, int dirPin, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade) {
     // Aloca dinamicamente um objeto AccelStepper
     AccelStepper* motor = new AccelStepper(AccelStepper::DRIVER, stepPin, dirPin);
+    
+    if (!motor) {
+        Serial.println("Erro: Falha ao alocar memória para o motor!");
+        return nullptr; // Retorna nullptr em caso de falha na alocação
+    }
 
-    // Configura os pinos de ENABLE
+    // Configura os pinos do motor
+    ConfigurarMotor(motor, enablePin, velocidadeMaxima, aceleracao, velocidade);
+
+    return motor; // Retorna o ponteiro para o motor criado
+}
+
+// Configura os parâmetros do motor e habilita o driver.
+
+void ConfigurarMotor(AccelStepper* motor, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade) {
     pinMode(enablePin, OUTPUT);
     digitalWrite(enablePin, LOW); // Habilita o motor
 
-    // Configura o motor
-    motor->setMaxSpeed(velocidadeMaxima);    // Velocidade máxima em passos por segundo
-    motor->setAcceleration(aceleracao);      // Aceleração em passos por segundo ao quadrado
-    motor->setSpeed(velocidade);             // Velocidade inicial em passos por segundo
-
-    return motor; // Retorna o ponteiro para o motor criado
+    motor->setMaxSpeed(velocidadeMaxima); // Velocidade máxima em passos/s
+    motor->setAcceleration(aceleracao);   // Aceleração em passos/s²
+    motor->setSpeed(velocidade);          // Velocidade inicial em passos/s
 }
 
 // Função para mover um motor (NÃO ESTÁ SENDO UTILIZADA)
@@ -145,6 +155,8 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int distancia1,
 
     Serial.println('y');
 }
+
+void calibracao(){}
 
 void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
     if ((!motor1) || (!motor2)) return;
