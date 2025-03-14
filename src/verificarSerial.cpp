@@ -17,9 +17,9 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
     float receivedPulsesDistance1, receivedPulsesDistance2,
     receivedDelay1, receivedDelay2, zero_laser;
 
-    int motor = 1;
+    static int motor = 1;
     int direcao1 = 1;
-    int direcao2 = -1;
+    int direcao2 = 1;
     int direcaoMotor = 1;
 
     if(Serial.available()){
@@ -43,7 +43,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
           break;
           }
           case ALTERAR_PARA_MOTORES_SIMULTANEOS:{
-            motor = 3;
+            motor = MOTORES_SIMULTANEOS;
             //Serial.println("Motores simultaneos sendo operados");
           break;
           }
@@ -66,15 +66,15 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
     
             if(motor == MOTOR_1){
               //Serial.println("c"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
-              direcao1 = -1;
+              direcao1 = 1;
               direcaoMotor = 1;
             }
             else if(motor == MOTOR_2){
               //Serial.println("C"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
-              direcao2 = -1;
-              direcaoMotor = 1;
+              direcao2 = 1;
+              direcaoMotor = -1;
             }else if(motor == MOTORES_SIMULTANEOS) {
-              direcao1 = -1;
+              direcao1 = 1;
               direcao2 = 1;
             }
           break;
@@ -84,7 +84,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             if(motor == MOTOR_1){
               //Serial.println(DIRECAO_MOTOR_1_BAIXO); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
               direcao1 = 1;
-              direcaoMotor = -1;
+              direcaoMotor = 1;
             }
             else if(motor == MOTOR_2){
               //Serial.println(DIRECAO_MOTOR_2_BAIXO); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
@@ -92,7 +92,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
               direcaoMotor = -1;
             }else if(motor == MOTORES_SIMULTANEOS){
               direcao1 = 1;
-              direcao2 = -1;
+              direcao2 = 1;
             }
     
           break;
@@ -185,15 +185,21 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
     
           break;
           }
-          case PARAR_MOTOR: //para o motor
+          case PARAR_MOTOR: //para o motor, #define PARAR_MOTOR 'n' no arquivo macros.h
           
             if(motor == 1){
-              paraMotor(motor1);
+              //paraMotor(motor1);
+              digitalWrite(PIN_ENABLE_1, 0);
+              pararMotor = true;
             }
             else if(motor == 2){
-              paraMotor(motor2);
+              //paraMotor(motor2);
+              digitalWrite(PIN_ENABLE_2, 0);
+              pararMotor = true;
             } else if(motor == 3){
+              //paraMotorSimultaneo(motor1, motor2);
               paraMotorSimultaneo(motor1, motor2);
+              pararMotorSimultaneo = true;
             }
 
           break;
@@ -340,6 +346,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             }
           break;
           }
+
           case MOVER_MOTORES_SIMULTANEOS: {
             String x = data.substring(1);
     
