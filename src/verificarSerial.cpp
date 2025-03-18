@@ -10,9 +10,10 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
     //Definição de variáveis
     String posicao_calculadaStr1, posicao_calculadaStr2;
 
-    int qtdPulsosMotor1, qtdPulsosMotor2, qtdPulsosMotores1, qtdPulsosMotores2, velocidadeMaxima1, velocidadeMaxima2, aceleracao1, aceleracao2, 
-    posicao_calculada1, posicao_calculada2, parar_calibracao,
+    int  aceleracao1, aceleracao2,  posicao_calculada1, posicao_calculada2, parar_calibracao,
     constanteCalibracao1, constanteCalibracao2, motorParou1;
+
+    float qtdPulsosMotor1, qtdPulsosMotor2, qtdPulsosMotores1, qtdPulsosMotores2, velocidadeMaxima1, velocidadeMaxima2;
 
     float receivedPulsesDistance1, receivedPulsesDistance2,
     receivedDelay1, receivedDelay2, zero_laser;

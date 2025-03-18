@@ -24,7 +24,7 @@ void moverAcelerado(AccelStepper* motor, long distancia, int velocidadeMaxima, i
 
 void moverUniforme(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao);
 
-void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int distancia1, int distancia2, int velocidadeMaxima1, int velocidadeMaxima2, String direcao);
+void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, String direcao);
 
 void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2);
 
