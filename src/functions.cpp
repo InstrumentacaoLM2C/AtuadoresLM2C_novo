@@ -107,7 +107,7 @@ void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int dire
     // Loop para mover os motores até que ambos atinjam suas posições desejadas
     while (motor->distanceToGo() != 0) {
         if (pararMotor) {
-            Serial.println("Parando motores...");
+            Serial.println("Parando motor...");
             break;
         }
 
@@ -115,14 +115,29 @@ void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int dire
         if (Serial.available()) {
             char comando = Serial.read();
             if (comando == 'n') {
-                pararMotor = true;
+                pararMotorSimultaneo = true;
                 Serial.println("Comando de parada recebido!");
                 break;
             }
         }
+
+        motor->run();  // Executa o movimento do motor
     }
 
-        motor->run();  // Executa o movimento do motor 1
+    // Para os motores ao terminar o movimento
+    motor->stop();
+
+    // Zera as acelerações e as velocidades
+    motor->setAcceleration(0);
+    motor->setSpeed(0);
+
+    // Reseta a posição dos motores
+    motor->setCurrentPosition(0);
+
+    // Desativa os motores após o movimento
+    motor->disableOutputs();
+
+    Serial.println("y");
 }
 
 
@@ -201,6 +216,9 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia
     motor1->disableOutputs();
     motor2->disableOutputs();
 
+    digitalWrite(PIN_ENABLE_1, LOW);
+    digitalWrite(PIN_ENABLE_2, LOW);
+
     Serial.println("y");
 }
 
@@ -268,6 +286,21 @@ void habilitarMotor(AccelStepper* motor, int enablePin){
 void desabilitarMotor(AccelStepper* motor, int enablePin) {
     if (motor) {
         digitalWrite(enablePin, LOW); // Desabilita o motor
+    }
+}
+
+
+void sensorIndutivo(AccelStepper* motor, int enablePin) {
+    if(!motor){
+        return;
+    }
+
+    if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) && !digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
+        paraMotor(motor);
+    } else if(!digitalRead(SENSOR_INDUTIVO_MOTOR_1) && digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
+
+    } else if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) && digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
+
     }
 }
 

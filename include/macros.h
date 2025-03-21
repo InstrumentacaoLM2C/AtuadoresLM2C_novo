@@ -15,6 +15,10 @@
 #define PIN_DIR_2 PB9   // Pino de direção (DIR) do Motor 2
 #define PIN_ENABLE_2 PB8  // Pino de ENABLE do Motor 2
 
+// Defina os pinos dos sensores indutivos
+#define SENSOR_INDUTIVO_MOTOR_1 PA1 
+#define SENSOR_INDUTIVO_MOTOR_2 PA2
+
 
 #define LIGAR_MOTOR                         'A'
 #define DESLIGAR_MOTOR                      'a'
