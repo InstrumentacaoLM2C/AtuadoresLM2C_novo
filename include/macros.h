@@ -12,12 +12,12 @@
 
 // Defina os pinos de controle do segundo motor
 #define PIN_PASSO_2 PB6  // Pino de passo (STEP) do Motor 2
-#define PIN_DIR_2 PB9   // Pino de direção (DIR) do Motor 2
-#define PIN_ENABLE_2 PB8  // Pino de ENABLE do Motor 2
+#define PIN_DIR_2 PB8   // Pino de direção (DIR) do Motor 2
+#define PIN_ENABLE_2 PB9  // Pino de ENABLE do Motor 2
 
 // Defina os pinos dos sensores indutivos
-#define SENSOR_INDUTIVO_MOTOR_1 PA1 
-#define SENSOR_INDUTIVO_MOTOR_2 PA2
+#define SENSOR_INDUTIVO_MOTOR_1 PB10  
+#define SENSOR_INDUTIVO_MOTOR_2 PB14
 
 
 #define LIGAR_MOTOR                         'A'
@@ -55,4 +55,4 @@
 #define DIRECAO_MOTOR_1_BAIXO               "Mover motor 1 para baixo"
 #define DIRECAO_MOTOR_2_BAIXO               "Mover motor 2 para baixo"
 
-#endif
+#endif 

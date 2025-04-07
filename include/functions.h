@@ -30,6 +30,8 @@ void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2);
 
 void paraMotor(AccelStepper* motor);
 
+void sensorIndutivo(AccelStepper* motor1, AccelStepper* motor2);
+
 void calibracao();
 
 void subsidencia(AccelStepper* motor, int velocidadeMaxima, int aceleracao, long distancia);
