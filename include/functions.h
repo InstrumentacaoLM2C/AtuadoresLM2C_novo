@@ -22,7 +22,7 @@ void moverMotor();
 
 void moverAcelerado(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao);
 
-void moverUniforme(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao);
+void moverUniforme(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao, int numMotor);
 
 void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, String direcao);
 
@@ -30,7 +30,9 @@ void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2);
 
 void paraMotor(AccelStepper* motor);
 
-void sensorIndutivo(AccelStepper* motor1, AccelStepper* motor2);
+void sensorIndutivo(AccelStepper* motor);
+
+void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2);
 
 void calibracao();
 

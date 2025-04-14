@@ -74,7 +74,7 @@ void moverAcelerado(AccelStepper* motor, long distancia, int velocidadeMaxima, i
 
 
 // Função para mover o motor de forma acelerada
-void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int direcao){
+void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int direcao, int numMotor){
     if (!motor) {
         return;
     }
@@ -89,10 +89,10 @@ void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int dire
     motor->enableOutputs();  // Ativa os motores
 
     if (direcao == 1) {  // Se direção for "C"
-        posicaoDesejada = posicaoInicial - distancia;  // Motor 1
-        
-    } else if (direcao == 0) {  // Se direção for "B"
         posicaoDesejada = posicaoInicial + distancia;  // Motor 1
+        
+    } else if (direcao == -1) {  // Se direção for "B"
+        posicaoDesejada = posicaoInicial - distancia;  // Motor 1
         
     } else {
         return; // Se direção inválida, sai da função
@@ -107,7 +107,10 @@ void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int dire
     // Loop para mover os motores até que ambos atinjam suas posições desejadas
     while (motor->distanceToGo() != 0) {
 
-        sensorIndutivo(motor);
+        if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
+            paraMotor(motor);
+        }
+
         if (pararMotor) {
             Serial.println("Parando motor...");
             break;
@@ -139,7 +142,12 @@ void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int dire
     // Desativa os motores após o movimento
     motor->disableOutputs();
 
-    Serial.println("y");
+    if(numMotor == 1){
+        Serial.println("y");
+    } else if(numMotor == 2){
+        Serial.println("Y");
+    }
+    
 }
 
 
@@ -181,8 +189,11 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia
 
     // Loop para mover os motores até que ambos atinjam suas posições desejadas
     while ((motor1->distanceToGo() != 0 || motor2->distanceToGo() != 0)) {
-        sensorIndutivoSimultaneo(motor1, motor2);
 
+        if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
+            paraMotorSimultaneo(motor1, motor2);
+        }
+        
         if (pararMotorSimultaneo) {
             Serial.println("Parando motores...");
             break;
@@ -220,8 +231,8 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia
     motor1->disableOutputs();
     motor2->disableOutputs();
 
-    digitalWrite(PIN_ENABLE_1, HIGH);
-    digitalWrite(PIN_ENABLE_2, HIGH); // >>>>>>>>>TESTAR COMO FAZER O MOTOR DESACOPLAR 02/04/2025<<<<<<<<<<<<<<<<<<<<<
+    digitalWrite(PIN_ENABLE_1, LOW);
+    digitalWrite(PIN_ENABLE_2, LOW); // >>>>>>>>>TESTAR COMO FAZER O MOTOR DESACOPLAR 02/04/2025<<<<<<<<<<<<<<<<<<<<<
 
     Serial.println("y");
 }
@@ -243,8 +254,8 @@ void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
     motor1->disableOutputs(); 
     motor2->disableOutputs();
 
-    digitalWrite(PIN_ENABLE_1, HIGH);
-    digitalWrite(PIN_ENABLE_2, HIGH);
+    digitalWrite(PIN_ENABLE_1, LOW);
+    digitalWrite(PIN_ENABLE_2, LOW);
 
 }
 
@@ -294,7 +305,7 @@ void desabilitarMotor(AccelStepper* motor, int enablePin) {
 }
 
 
-void sensorIndutivo(AccelStepper* motor) {
+/*void sensorIndutivo(AccelStepper* motor) {
     if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
         paraMotor(motor);
     }    
@@ -307,5 +318,5 @@ void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
         paraMotorSimultaneo(motor1, motor2);
     }
 
-}
+}*/
 

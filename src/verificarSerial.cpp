@@ -154,12 +154,12 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
           case ATIVAR_MOTOR_VEL_CTE :     //First character is an H = motor spins with constant speed
             if(motor == '1'){
               //Serial.println("/O motor 1 se move com velocidade constante!");
-              moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor);
+              moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor, 1);
               
             }
             else if(motor == '2'){
               //Serial.println("/O motor 2 se move com velocidade constante!");
-              moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor);
+              moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor, 2);
     
             }
           break;
@@ -190,17 +190,17 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
           
             if(motor == 1){
               //paraMotor(motor1);
-              digitalWrite(PIN_ENABLE_1, 0);
+              paraMotor(motor1);
               pararMotor = true;
             }
             else if(motor == 2){
               //paraMotor(motor2);
-              digitalWrite(PIN_ENABLE_2, 0);
+              paraMotor(motor2);
               pararMotor = true;
             } else if(motor == 3){
               //paraMotorSimultaneo(motor1, motor2);
               paraMotorSimultaneo(motor1, motor2);
-              pararMotorSimultaneo = true;
+              
             }
 
           break;
@@ -262,8 +262,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             Serial.print("\nSensor indutivo ativado"); //Printa a constante de calibração no app do VSCode 
           break;
     
-          case ALTERAR_PARA_MOTOR_2: //Função para mudar qual motor está sendo utilizado.
-    
+          case ALTERAR_PARA_MOTOR_2: //Função para mudar qual motor está sendo utilizado.W
             motor = 2;
             //Serial.println('u'); //Segundo motor sendo operado!
           break;
@@ -277,7 +276,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             //subsidencia(); // Função que movimenta o motor para frente e para trás (2 voltas completas) ativando o mecanismo de subsidência
           break;
     
-          case ENVIAR_CONFIG_COMPLETA: { // recebe todas as informações do motor de uma vez e aciona o motor
+          case ENVIAR_CONFIG_COMPLETA: { // recebe todas as informações do motor de uma vez e aciona o motor 'T'
             String x = data.substring(1);
     
             //código para separar as strings 
@@ -314,7 +313,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
                 direcaoMotor = -1;
               }
               if(mover == "H"){
-                moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor);
+                moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor, 1);
               }
     
               
@@ -341,7 +340,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
                 direcaoMotor = -1;
               }
               if(mover == "H"){
-                moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor);
+                moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor, 2);
               }
               
             }
