@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include "functions.h"
 #include "macros.h"
+#include "globals.h"
 #include <AccelStepper.h>
 
 //Declaração de variáveis para motores
 AccelStepper* motor1 = nullptr; 
 AccelStepper* motor2 = nullptr;
+
 
 //Declaração de variáveis para paramêtros do motor
 int velocidadeMaxima = 0, aceleracaoMaxima = 0, velocidade = 0;
@@ -36,4 +38,21 @@ void loop() {
 
   //Chamada de funções
   VerificarSerial(motor1, motor2, velocidadeMaxima, aceleracaoMaxima, velocidade);
+  if (emMovimento1) {
+    motor1->run();
+    if (motor1->distanceToGo() == 0) {
+      emMovimento1 = false;
+      motor1->disableOutputs();
+      Serial.println("y");
+    }
+  }
+
+  if (emMovimento2) {
+    motor2->run();
+    if (motor2->distanceToGo() == 0) {
+      emMovimento2 = false;
+      motor2->disableOutputs();
+      Serial.println("Y");
+    }
+  }
 }

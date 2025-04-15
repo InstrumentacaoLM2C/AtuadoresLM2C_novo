@@ -74,81 +74,25 @@ void moverAcelerado(AccelStepper* motor, long distancia, int velocidadeMaxima, i
 
 
 // Função para mover o motor de forma acelerada
-void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int direcao, int numMotor){
-    if (!motor) {
-        return;
-    }
-
+void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int direcao, int numMotor) {
+    if (!motor) return;
+  
     long posicaoInicial = motor->currentPosition();
-    long posicaoDesejada;
-
-    pararMotorSimultaneo = false;
-
-    motor->setMaxSpeed(abs(velocidade));  // Define a velocidade máxima
-
-    motor->enableOutputs();  // Ativa os motores
-
-    if (direcao == 1) {  // Se direção for "C"
-        posicaoDesejada = posicaoInicial + distancia;  // Motor 1
-        
-    } else if (direcao == -1) {  // Se direção for "B"
-        posicaoDesejada = posicaoInicial - distancia;  // Motor 1
-        
-    } else {
-        return; // Se direção inválida, sai da função
+    if (numMotor == 1) {
+        direcao = -direcao;
+    } else if (numMotor == 2) {
+        direcao = -direcao;
     }
-
-    motor->setAcceleration(5000);  // Define aceleração
-
-    motor->moveTo(posicaoDesejada);  // Move motor 1 para a posição desejada
-
-    Serial.println("Movendo motor...");
-
-    // Loop para mover os motores até que ambos atinjam suas posições desejadas
-    while (motor->distanceToGo() != 0) {
-
-        if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
-            paraMotor(motor);
-        }
-
-        if (pararMotor) {
-            Serial.println("Parando motor...");
-            break;
-        }
-
-        // Verifica se há comandos de parada
-        if (Serial.available()) {
-            char comando = Serial.read();
-            if (comando == 'n') {
-                pararMotorSimultaneo = true;
-                Serial.println("Comando de parada recebido!");
-                break;
-            }
-        }
-
-        motor->run();  // Executa o movimento do motor
-    }
-
-    // Para os motores ao terminar o movimento
-    motor->stop();
-
-    // Zera as acelerações e as velocidades
-    motor->setAcceleration(0);
-    motor->setSpeed(0);
-
-    // Reseta a posição dos motores
-    motor->setCurrentPosition(0);
-
-    // Desativa os motores após o movimento
-    motor->disableOutputs();
-
-    if(numMotor == 1){
-        Serial.println("y");
-    } else if(numMotor == 2){
-        Serial.println("Y");
-    }
-    
-}
+    long posicaoDesejada = (direcao == 1) ? posicaoInicial + distancia : posicaoInicial - distancia;
+  
+    motor->setMaxSpeed(abs(velocidade));
+    motor->setAcceleration(5000);
+    motor->enableOutputs();
+    motor->moveTo(posicaoDesejada);
+  
+    if (numMotor == 1) emMovimento1 = true;
+    if (numMotor == 2) emMovimento2 = true;
+  }
 
 
 void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, String direcao) {
@@ -259,10 +203,21 @@ void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
 
 }
 
-void paraMotor(AccelStepper* motor){
+void paraMotor1(AccelStepper* motor){
     if (!motor) return;
 
-    pararMotor = true;
+    pararMotor1 = true;
+
+    motor->setSpeed(0); // Para o motor imediatamente
+    motor->setCurrentPosition(0); // Redefine a posição atual do motor para
+    motor->disableOutputs(); // Desabilita as saídas do motor (desliga a energia)
+    
+}
+
+void paraMotor2(AccelStepper* motor){
+    if (!motor) return;
+
+    pararMotor2 = true;
 
     motor->setSpeed(0); // Para o motor imediatamente
     motor->setCurrentPosition(0); // Redefine a posição atual do motor para
@@ -319,4 +274,24 @@ void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
     }
 
 }*/
+
+void AtualizarMovimentoDosMotores(AccelStepper* motor1, AccelStepper* motor2) {
+
+    if (motor1 && motor1->isRunning()) {
+        if (digitalRead(SENSOR_INDUTIVO_MOTOR_1) || pararMotor1) {
+            paraMotor1(motor1);
+          } else {
+            motor1->run();
+          }
+    }
+  
+    if (motor2 && motor2->isRunning()) {
+        if (digitalRead(SENSOR_INDUTIVO_MOTOR_2) || pararMotor2) {
+            paraMotor2(motor2);
+          } else {
+            motor2->run();
+          }
+    }
+}
+
 

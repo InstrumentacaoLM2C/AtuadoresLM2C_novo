@@ -190,13 +190,13 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
           
             if(motor == 1){
               //paraMotor(motor1);
-              paraMotor(motor1);
-              pararMotor = true;
+              paraMotor1(motor1);
+              pararMotor1 = true;
             }
             else if(motor == 2){
               //paraMotor(motor2);
-              paraMotor(motor2);
-              pararMotor = true;
+              paraMotor2(motor2);
+              pararMotor2 = true;
             } else if(motor == 3){
               //paraMotorSimultaneo(motor1, motor2);
               paraMotorSimultaneo(motor1, motor2);

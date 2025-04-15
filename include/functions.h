@@ -28,7 +28,9 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia
 
 void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2);
 
-void paraMotor(AccelStepper* motor);
+void paraMotor1(AccelStepper* motor);
+
+void paraMotor2(AccelStepper* motor);
 
 void sensorIndutivo(AccelStepper* motor);
 
@@ -37,5 +39,7 @@ void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2);
 void calibracao();
 
 void subsidencia(AccelStepper* motor, int velocidadeMaxima, int aceleracao, long distancia);
+
+void AtualizarMovimentoDosMotores(AccelStepper* motor1, AccelStepper* motor2);
 
 #endif
