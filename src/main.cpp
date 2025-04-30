@@ -21,8 +21,8 @@ void setup() {
   pinMode(PIN_ENABLE_2, OUTPUT);
 
   // Desabilita os motores inicialmente (ENABLE em HIGH)
-  digitalWrite(PIN_ENABLE_1, HIGH);
-  digitalWrite(PIN_ENABLE_2, HIGH);
+  //digitalWrite(PIN_ENABLE_1, LOW);
+  //digitalWrite(PIN_ENABLE_2, LOW);
 
   //Configuração de velocidade e aceleração
   velocidadeMaxima = 8000;
@@ -38,6 +38,7 @@ void loop() {
 
   //Chamada de funções
   VerificarSerial(motor1, motor2, velocidadeMaxima, aceleracaoMaxima, velocidade);
+  
   if (emMovimento1) {
     motor1->run();
     if (motor1->distanceToGo() == 0) {
@@ -53,6 +54,17 @@ void loop() {
       emMovimento2 = false;
       motor2->disableOutputs();
       Serial.println("Y");
+    }
+  }
+
+  if(emMovimentoSimultaneo) {
+    motor1->run();
+    motor2->run();
+    if (motor1->distanceToGo() == 0 || motor2->distanceToGo() ==0){
+      emMovimentoSimultaneo = false;
+      motor1->disableOutputs();
+      motor2->disableOutputs();
+      Serial.println("y");
     }
   }
 }

@@ -23,7 +23,7 @@ AccelStepper* CriarMotor(int stepPin, int dirPin, int enablePin, int velocidadeM
 
 void ConfigurarMotor(AccelStepper* motor, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade) {
     pinMode(enablePin, OUTPUT);
-    digitalWrite(enablePin, LOW); // Habilita o motor
+    digitalWrite(enablePin, HIGH); // Habilita o motor
 
     motor->setMaxSpeed(velocidadeMaxima); // Velocidade máxima em passos/s
     motor->setAcceleration(aceleracao);   // Aceleração em passos/s²
@@ -131,54 +131,7 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia
 
     Serial.println("Movendo motores...");
 
-    // Loop para mover os motores até que ambos atinjam suas posições desejadas
-    while ((motor1->distanceToGo() != 0 || motor2->distanceToGo() != 0)) {
-
-        if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
-            paraMotorSimultaneo(motor1, motor2);
-        }
-        
-        if (pararMotorSimultaneo) {
-            Serial.println("Parando motores...");
-            break;
-        }
-
-        // Verifica se há comandos de parada
-        if (Serial.available()) {
-            char comando = Serial.read();
-            if (comando == 'n') {
-                pararMotorSimultaneo = true;
-                Serial.println("Comando de parada recebido!");
-                break;
-            }
-        }
-
-        motor1->run();  // Executa o movimento do motor 1
-        motor2->run();  // Executa o movimento do motor 2
-    }
-
-    // Para os motores ao terminar o movimento
-    motor1->stop();
-    motor2->stop();
-
-    // Zera as acelerações e as velocidades
-    motor1->setAcceleration(0);
-    motor2->setAcceleration(0);
-    motor1->setSpeed(0);
-    motor2->setSpeed(0);
-
-    // Reseta a posição dos motores
-    motor1->setCurrentPosition(0);
-    motor2->setCurrentPosition(0);
-
-    // Desativa os motores após o movimento
-    motor1->disableOutputs();
-    motor2->disableOutputs();
-
-    digitalWrite(PIN_ENABLE_1, LOW);
-    digitalWrite(PIN_ENABLE_2, LOW); // >>>>>>>>>TESTAR COMO FAZER O MOTOR DESACOPLAR 02/04/2025<<<<<<<<<<<<<<<<<<<<<
-
-    Serial.println("y");
+    emMovimentoSimultaneo = true;
 }
 
 void calibracao(){}
@@ -197,9 +150,6 @@ void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
 
     motor1->disableOutputs(); 
     motor2->disableOutputs();
-
-    digitalWrite(PIN_ENABLE_1, LOW);
-    digitalWrite(PIN_ENABLE_2, LOW);
 
 }
 
@@ -225,8 +175,7 @@ void paraMotor2(AccelStepper* motor){
     
 }
 
-void subsidencia(AccelStepper* motor, int velocidadeMaxima, int aceleracao, long distancia){
-    digitalWrite(PIN_ENABLE_1, HIGH);
+/*void subsidencia(AccelStepper* motor, int velocidadeMaxima, int aceleracao, long distancia){
     motor->setMaxSpeed(velocidadeMaxima);
     motor->setAcceleration(aceleracao);
     motor->move(distancia);
@@ -243,8 +192,10 @@ void subsidencia(AccelStepper* motor, int velocidadeMaxima, int aceleracao, long
     }
 
     delay(50);
-    digitalWrite(PIN_ENABLE_1, LOW);
+
 }
+*/
+
 
 void habilitarMotor(AccelStepper* motor, int enablePin){
     if(motor){
