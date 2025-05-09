@@ -4,6 +4,10 @@
 #include "globals.h"
 #include <AccelStepper.h>
 
+//ULTIMA VERSAO
+
+int commit;
+
 //Declaração de variáveis para motores
 AccelStepper* motor1 = nullptr; 
 AccelStepper* motor2 = nullptr;
