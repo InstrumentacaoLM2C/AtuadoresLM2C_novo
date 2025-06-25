@@ -18,11 +18,11 @@ int velocidadeMaxima = 0, aceleracaoMaxima = 0, velocidade = 0;
 
 void setup() {
 
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   // Configura os pinos de ENABLE como saída
-  pinMode(PIN_ENABLE_1, OUTPUT);
-  pinMode(PIN_ENABLE_2, OUTPUT);
+  //pinMode(PIN_ENABLE_1, OUTPUT);
+  //pinMode(PIN_ENABLE_2, OUTPUT);
 
   // Desabilita os motores inicialmente (ENABLE em HIGH)
   //digitalWrite(PIN_ENABLE_1, LOW);
@@ -64,7 +64,7 @@ void loop() {
   if(emMovimentoSimultaneo) {
     motor1->run();
     motor2->run();
-    if (motor1->distanceToGo() == 0 || motor2->distanceToGo() ==0){
+    if (motor1->distanceToGo() == 0 || motor2->distanceToGo() == 0){
       emMovimentoSimultaneo = false;
       motor1->disableOutputs();
       motor2->disableOutputs();

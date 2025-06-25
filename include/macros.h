@@ -6,18 +6,18 @@
 #define ERROR_MOTOR_NAO_SELECIONADO         1
 
 // Defina os pinos de controle do primeiro motor
-#define PIN_PASSO_1 PB3  // Pino de passo (STEP) do Motor 1
-#define PIN_DIR_1 PB4   // Pino de direção (DIR) do Motor 1
-#define PIN_ENABLE_1 PB5  // Pino de ENABLE do Motor 1
+#define PIN_PASSO_1 6  // Pino de passo (STEP) do Motor 1
+#define PIN_DIR_1 5 // Pino de direção (DIR) do Motor 1
+#define PIN_ENABLE_1 4  // Pino de ENABLE do Motor 1
 
 // Defina os pinos de controle do segundo motor
-#define PIN_PASSO_2 PB6  // Pino de passo (STEP) do Motor 2
-#define PIN_DIR_2 PB8   // Pino de direção (DIR) do Motor 2
-#define PIN_ENABLE_2 PB9  // Pino de ENABLE do Motor 2
+#define PIN_PASSO_2 7  // Pino de passo (STEP) do Motor 2 0 4.53  4.22
+#define PIN_DIR_2 3   // Pino de direção (DIR) do Motor 2 0 4.54 4.36
+#define PIN_ENABLE_2 2  // Pino de ENABLE do Motor 2 4 4.54 0
 
 // Defina os pinos dos sensores indutivos
-#define SENSOR_INDUTIVO_MOTOR_1 PB10  
-#define SENSOR_INDUTIVO_MOTOR_2 PB14
+#define SENSOR_INDUTIVO_MOTOR_1 13 
+#define SENSOR_INDUTIVO_MOTOR_2 14
 
 
 #define LIGAR_MOTOR                         'A'
@@ -34,8 +34,8 @@
 
 #define QTD_PULSOS                          'P'
 
-#define MOVER_MOTOR_BAIXO                   'B'
-#define MOVER_MOTOR_CIMA                    'C'
+#define MOVER_MOTOR_BAIXO                   1
+#define MOVER_MOTOR_CIMA                    0
 
 
 #define INICIAR_CALIBRACAO                  'I'

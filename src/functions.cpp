@@ -8,8 +8,9 @@ AccelStepper* CriarMotor(int stepPin, int dirPin, int enablePin, int velocidadeM
     // Aloca dinamicamente um objeto AccelStepper
     AccelStepper* motor = new AccelStepper(AccelStepper::DRIVER, stepPin, dirPin);
     
+    
     if (!motor) {
-        Serial.println("Erro: Falha ao alocar memória para o motor!");
+        
         return nullptr; // Retorna nullptr em caso de falha na alocação
     }
 
@@ -23,7 +24,7 @@ AccelStepper* CriarMotor(int stepPin, int dirPin, int enablePin, int velocidadeM
 
 void ConfigurarMotor(AccelStepper* motor, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade) {
     pinMode(enablePin, OUTPUT);
-    digitalWrite(enablePin, HIGH); // Habilita o motor
+    digitalWrite(enablePin, LOW);
 
     motor->setMaxSpeed(velocidadeMaxima); // Velocidade máxima em passos/s
     motor->setAcceleration(aceleracao);   // Aceleração em passos/s²
@@ -95,8 +96,10 @@ void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int dire
   }
 
 
-void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, String direcao) {
+void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, char direcao) {
     // Verifica se os motores são válidos
+    String resposta;
+    
     if ((!motor1) || (!motor2)) {
         return;
     }
@@ -113,10 +116,12 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia
     motor1->enableOutputs();  // Ativa os motores
     motor2->enableOutputs();  // Ativa os motores
 
-    if (direcao.equals("C")) {  // Se direção for "C"
+    if (direcao == 'B') {  // Se direção for 1
+        resposta = "horario";
         posicaoDesejada1 = posicaoInicial1 - distancia1;  // Motor 1
         posicaoDesejada2 = posicaoInicial2 - distancia2;  // Motor 2
-    } else if (direcao.equals("B")) {  // Se direção for "B"
+    } else if (direcao == 'C') {  // Se direção for 0
+        resposta = "antihorario";
         posicaoDesejada1 = posicaoInicial1 + distancia1;  // Motor 1
         posicaoDesejada2 = posicaoInicial2 + distancia2;  // Motor 2
     } else {
@@ -128,8 +133,6 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia
 
     motor1->moveTo(posicaoDesejada1);  // Move motor 1 para a posição desejada
     motor2->moveTo(posicaoDesejada2);  // Move motor 2 para a posição desejada
-
-    Serial.println("Movendo motores...");
 
     emMovimentoSimultaneo = true;
 }

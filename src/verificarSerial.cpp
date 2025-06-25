@@ -31,15 +31,15 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
     
           case LIGAR_MOTOR:{         //Se o primeiro caractere for A, liga o motor
             if(motor == MOTOR_1){
-              digitalWrite(PIN_ENABLE_1, 1);
+              digitalWrite(PIN_ENABLE_1, HIGH);
               //Serial.println("/Motor 1 ligado!");
             }
             else if(motor == MOTOR_2){
-              digitalWrite(PIN_ENABLE_2, 1);
+              digitalWrite(PIN_ENABLE_2, HIGH);
               //Serial.println("/Motor 2 ligado!");
             }else if(motor == MOTORES_SIMULTANEOS){
-              digitalWrite(PIN_ENABLE_1, 1);
-              digitalWrite(PIN_ENABLE_2, 1);
+              digitalWrite(PIN_ENABLE_1, HIGH);
+              digitalWrite(PIN_ENABLE_2, HIGH);
             }
           break;
           }
@@ -51,15 +51,15 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
 
           case DESLIGAR_MOTOR:         //Se o primeiro caractere for a, desliga o motor
             if(motor == MOTOR_1){
-              digitalWrite(PIN_ENABLE_1, 0);
+              digitalWrite(PIN_ENABLE_1, LOW);
               //Serial.println("/Motor 1 desligado!");
             }
             else if(motor == MOTOR_2){
-              digitalWrite(PIN_ENABLE_2, 0);
+              digitalWrite(PIN_ENABLE_2, LOW);
               //Serial.println("/Motor 2 desligado!");
             } else if(motor == MOTORES_SIMULTANEOS){
-              digitalWrite(PIN_ENABLE_1, 0);
-              digitalWrite(PIN_ENABLE_2, 0);
+              digitalWrite(PIN_ENABLE_1, LOW);
+              digitalWrite(PIN_ENABLE_2, LOW);
             }
           break;
           
@@ -293,7 +293,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             //Exemplo T2000;200;B;H#        
             if(motor == 1){
               //liga motor
-              digitalWrite(PIN_ENABLE_1, 1);
+              digitalWrite(PIN_ENABLE_1, HIGH);
               //Serial.println("/Motor 1 ligado!");
               //recebe pulsos
               qtdPulsosMotor1 = pulso.toFloat(); //value for the steps
@@ -320,7 +320,7 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             }
             else if(motor == 2){
               //liga motor
-              digitalWrite(PIN_ENABLE_2, 1);
+              digitalWrite(PIN_ENABLE_2, HIGH);
               //Serial.println("/Motor 2 ligado!");
               //recebe pulsos
               qtdPulsosMotor2 = pulso.toFloat(); //value for the steps
@@ -363,31 +363,19 @@ void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeM
             String pulso2 = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex); // "terceiro numero"
             String velocidade2 = x.substring(thirdSeparatorIndex + 1, fourthSeparatorIndex); // "quarto numero"
             String direcao = x.substring(fourthSeparatorIndex + 1, fifthSeparatorIndex); // "caracter B ou C"
-            String mover = x.substring(fifthSeparatorIndex + 1); // "caracter H ou x"
+            String mover = x.substring(fifthSeparatorIndex + 1); // "caracter H ou x
 
-            Serial.print("Direção do motor: (case)" + direcao);
-
-            digitalWrite(PIN_ENABLE_1, 1);
-            digitalWrite(PIN_ENABLE_2, 1);
+            digitalWrite(PIN_ENABLE_1, HIGH);
+            digitalWrite(PIN_ENABLE_2, HIGH);
 
             qtdPulsosMotores1 = pulso1.toFloat();
             velocidadeMaxima1 = velocidade1.toFloat();
             qtdPulsosMotores2 = pulso2.toFloat();
             velocidadeMaxima2 = velocidade2.toFloat();
+            char direcaoChar = direcao[0];
             
-            /*if(direcao == "B"){
-              //Serial.println("B"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
-              direcao1 = -1;
-              direcao2 = 1;
-            }
-            else if(direcao == "C"){
-                //Serial.println("C"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
-              direcao1 = 1;
-              direcao2 = -1;
-            }*/
-
             if(mover.equals("H")){
-              moverSimultaneo(motor1, motor2, qtdPulsosMotores1, qtdPulsosMotores2, velocidadeMaxima1, velocidadeMaxima2, direcao);
+              moverSimultaneo(motor1, motor2, qtdPulsosMotores1, qtdPulsosMotores2, velocidadeMaxima1, velocidadeMaxima2, direcaoChar);
             }
 
 
