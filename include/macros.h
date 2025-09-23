@@ -6,14 +6,28 @@
 #define ERROR_MOTOR_NAO_SELECIONADO         1
 
 // Defina os pinos de controle do primeiro motor
-#define PIN_PASSO_1 6  // Pino de passo (STEP) do Motor 1
-#define PIN_DIR_1 5 // Pino de direção (DIR) do Motor 1
-#define PIN_ENABLE_1 4  // Pino de ENABLE do Motor 1
+// Motor 1 = Vertical
+#define PIN_PASSO_1 4 // Pino de passo (STEP) 8 do Motor 1 4
+#define PIN_DIR_1   3     // Pino de direção (DIR) 9 do Motor 1 3 
+#define PIN_ENABLE_1 2    // Pino de ENABLE 10 do Motor 1 2
 
 // Defina os pinos de controle do segundo motor
-#define PIN_PASSO_2 7  // Pino de passo (STEP) do Motor 2 0 4.53  4.22
-#define PIN_DIR_2 3   // Pino de direção (DIR) do Motor 2 0 4.54 4.36
-#define PIN_ENABLE_2 2  // Pino de ENABLE do Motor 2 4 4.54 0
+// Motor 2 = Horizontal
+#define PIN_PASSO_2 7  // Pino de passo (STEP) 11 do Motor 2 0 4.53  4.22
+#define PIN_DIR_2 6    // Pino de direção (DIR) 12 do Motor 2 0 4.54 4.36
+#define PIN_ENABLE_2 5  // Pino de ENABLE 13 do Motor 2 4 4.54 0
+
+// Defina os pinos de controle do segundo motor
+// Motor 3 
+#define PIN_PASSO_3 10  // Pino de passo (STEP)2 do Motor 2 0 4.53  4.22 10
+#define PIN_DIR_3 9     // Pino de direção (DIR) 3 do Motor 2 0 4.54 4.36 9
+#define PIN_ENABLE_3 8  // Pino de ENABLE 4 do Motor 2 4 4.54 0 8
+
+// Defina os pinos de controle do segundo motor
+// Motor 4 
+#define PIN_PASSO_4 13  // Pino de passo (STEP) 5 do Motor 2 0 4.53  4.22
+#define PIN_DIR_4 11     // Pino de direção (DIR) 6 do Motor 2 0 4.54 4.36
+#define PIN_ENABLE_4 12   // Pino de ENABLE 7 do Motor 2 4 4.54 0
 
 // Defina os pinos dos sensores indutivos
 #define SENSOR_INDUTIVO_MOTOR_1 13 
@@ -24,13 +38,17 @@
 #define DESLIGAR_MOTOR                      'a'
 #define PARAR_MOTOR                         'n'
 #define MOVER_MOTORES_SIMULTANEOS           'W'
+#define MOVER_MOTORES_FALHA                 'L'
+#define MOVER_MOTOR_UNIVERSAL               'Z'
 #define ALTERAR_PARA_MOTOR_1                'R'
 #define ALTERAR_PARA_MOTOR_2                'M'
 #define ALTERAR_PARA_MOTORES_SIMULTANEOS    'm'
+#define ALTERAR_PARA_MOTORES_FALHA          'l'
 
 #define MOTOR_1                              1
 #define MOTOR_2                              2
 #define MOTORES_SIMULTANEOS                  3
+#define MOTORES_FALHA                        4
 
 #define QTD_PULSOS                          'P'
 

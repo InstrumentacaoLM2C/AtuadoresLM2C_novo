@@ -16,17 +16,21 @@ int MoverMotor(AccelStepper* motor, long distancia);
 // Função para desabilitar um motor
 void DesabilitarMotor(AccelStepper* motor, int enablePin);
 
-void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, int velocidadeMaxima, int velocidade, int aceleracaoMaxima);
+void VerificarSerial(AccelStepper* motor1, AccelStepper* motor2, AccelStepper* motor3, AccelStepper* motor4, int velocidadeMaxima, int velocidade, int aceleracaoMaxima);
 
 void moverMotor();
 
 void moverAcelerado(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao);
 
-void moverUniforme(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao, int numMotor);
+void moverUniforme(AccelStepper* motor, double distancia, int velocidadeMaxima, char direcao, int numMotor);
 
-void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, char direcao);
+void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, char direcao, int tipoMotor);
 
-void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2);
+void moverUniversal(AccelStepper* motor1, AccelStepper* motor2, AccelStepper* motor3, AccelStepper* motor4, 
+    float distancia1, float distancia2, float velocidade1, float velocidade2, char direcao1, char direcao2,
+    float distanciaUnidrecional, float velocidadeUnidrecional, char direcaoUnidirecional);
+
+void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int tipoMotor);
 
 void paraMotor1(AccelStepper* motor);
 
