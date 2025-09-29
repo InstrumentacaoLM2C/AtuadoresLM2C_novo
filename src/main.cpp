@@ -78,7 +78,7 @@ void loop() {
       emMovimentoSimultaneo = false;
       motor1->disableOutputs();
       motor2->disableOutputs();
-      Serial.println("y");
+      Serial.println('y');
     }
   }
 
@@ -89,7 +89,7 @@ void loop() {
       emMovimentoFalha = false;
       motor3->disableOutputs();
       motor4->disableOutputs();
-      Serial.println("Y");
+      Serial.println('Y');
     }
   }
 }
