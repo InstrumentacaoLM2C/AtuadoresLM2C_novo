@@ -26,8 +26,8 @@
 // Defina os pinos de controle do segundo motor
 // Motor 4 
 #define PIN_PASSO_4 13  // Pino de passo (STEP) 5 do Motor 2 0 4.53  4.22
-#define PIN_DIR_4 11     // Pino de direção (DIR) 6 do Motor 2 0 4.54 4.36
-#define PIN_ENABLE_4 12   // Pino de ENABLE 7 do Motor 2 4 4.54 0
+#define PIN_DIR_4 12     // Pino de direção (DIR) 6 do Motor 2 0 4.54 4.36
+#define PIN_ENABLE_4 11   // Pino de ENABLE 7 do Motor 2 4 4.54 0
 
 // Defina os pinos dos sensores indutivos
 #define SENSOR_INDUTIVO_MOTOR_1 13 
