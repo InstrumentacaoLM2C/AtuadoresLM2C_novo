@@ -84,7 +84,6 @@ void moverAcelerado(AccelStepper *motor, long distancia, int velocidadeMaxima, i
     }
 }
 
-// Função para mover o motor de forma acelerada
 void moverUniforme(AccelStepper *motor, double distancia, int velocidade, char direcao, int numMotor)
 {
     if (!motor)
@@ -126,7 +125,6 @@ void moverUniforme(AccelStepper *motor, double distancia, int velocidade, char d
         emMovimento2 = true;
 }
 
-
 void moverSimultaneo(AccelStepper *motor1, AccelStepper *motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, char direcao, int tipoMotor)
 {
     // Verifica se os motores são válidos
@@ -140,10 +138,13 @@ void moverSimultaneo(AccelStepper *motor1, AccelStepper *motor2, float distancia
     double posicaoInicial1 = motor1->currentPosition();
     double posicaoInicial2 = motor2->currentPosition();
     double posicaoDesejada1, posicaoDesejada2;
-    
-    if (tipoMotor == 1){
+
+    if (tipoMotor == 1)
+    {
         pararMotorSimultaneo = false;
-    } else if (tipoMotor == 2){
+    }
+    else if (tipoMotor == 2)
+    {
         pararMotorFalha = false;
     }
 
@@ -176,14 +177,15 @@ void moverSimultaneo(AccelStepper *motor1, AccelStepper *motor2, float distancia
     motor1->moveTo(posicaoDesejada1); // Move motor 1 para a posição desejada
     motor2->moveTo(posicaoDesejada2); // Move motor 2 para a posição desejada
 
-    if(tipoMotor == 1){
+    if (tipoMotor == 1)
+    {
         emMovimentoSimultaneo = true;
-     } else if(tipoMotor == 2){
+    }
+    else if (tipoMotor == 2)
+    {
         emMovimentoFalha = true;
-     }
-    
+    }
 }
-
 
 void moverUniversal(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *motor3, AccelStepper *motor4,
                     float distancia1, float distancia2, float velocidade1, float velocidade2, char direcao1, char direcao2,
@@ -215,13 +217,13 @@ void moverUniversal(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *mo
 
     if (direcao1 == 'B')
     { // Se direção for 1
-       
+
         posicaoDesejada1 = posicaoInicial1 - distancia1; // Motor 1
         posicaoDesejada2 = posicaoInicial2 - distancia2; // Motor 2
     }
     else if (direcao1 == 'C')
     { // Se direção for 0
-    
+
         posicaoDesejada1 = posicaoInicial1 + distancia1; // Motor 1
         posicaoDesejada2 = posicaoInicial2 + distancia2; // Motor 2
     }
@@ -239,20 +241,21 @@ void moverUniversal(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *mo
     emMovimentoSimultaneo = true;
 }
 
-
 void calibracao() {}
 
 void paraMotorSimultaneo(AccelStepper *motor1, AccelStepper *motor2, int tipoMotor)
 {
     if ((!motor1) || (!motor2))
         return;
-        
-    if(tipoMotor == 1) {
+
+    if (tipoMotor == 1)
+    {
         pararMotorSimultaneo = true;
-    } else if(tipoMotor == 2){
+    }
+    else if (tipoMotor == 2)
+    {
         pararMotorFalha = true;
     }
-    
 
     // Para o motor instantaneamente definindo velocidade zero
     motor1->setSpeed(0);
@@ -289,27 +292,6 @@ void paraMotor2(AccelStepper *motor)
     motor->disableOutputs();      // Desabilita as saídas do motor (desliga a energia)
 }
 
-/*void subsidencia(AccelStepper* motor, int velocidadeMaxima, int aceleracao, long distancia){
-    motor->setMaxSpeed(velocidadeMaxima);
-    motor->setAcceleration(aceleracao);
-    motor->move(distancia);
-
-    while(motor->distanceToGo() != 0){
-        motor->run();
-    }
-
-    delay(50);
-
-    motor->move(-distancia);
-    while(motor->distanceToGo() != 0){
-        motor->run();
-    }
-
-    delay(50);
-
-}
-*/
-
 void habilitarMotor(AccelStepper *motor, int enablePin)
 {
     if (motor)
@@ -327,45 +309,34 @@ void desabilitarMotor(AccelStepper *motor, int enablePin)
     }
 }
 
-/*void sensorIndutivo(AccelStepper* motor) {
-    if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
-        paraMotor(motor);
+
+void sensorIndutivo(AccelStepper* motor, int numMotor) {
+    int valorLido1 = analogRead(SENSOR_INDUTIVO_MOTOR_1);
+    int valorLido2 = analogRead(SENSOR_INDUTIVO_MOTOR_2);
+
+    if(numMotor == 1){
+        if(valorLido1 > limiarSensor){
+            emMovimento1 = false;
+        }
+    } else {
+        if(valorLido2 > limiarSensor){
+            emMovimento2 = false;
+        }
     }
 }
 
+void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int tipoMotor) {
 
-void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
+    int valorLido1 = analogRead(SENSOR_INDUTIVO_MOTOR_1);
+    int valorLido2 = analogRead(SENSOR_INDUTIVO_MOTOR_2);
 
-    if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
-        paraMotorSimultaneo(motor1, motor2);
-    }
-
-}*/
-
-void AtualizarMovimentoDosMotores(AccelStepper *motor1, AccelStepper *motor2)
-{
-
-    if (motor1 && motor1->isRunning())
-    {
-        if (digitalRead(SENSOR_INDUTIVO_MOTOR_1) || pararMotor1)
-        {
-            paraMotor1(motor1);
+    if(tipoMotor == 1){
+        if(valorLido1 > limiarSensor){
+            emMovimentoSimultaneo = false;
         }
-        else
-        {
-            motor1->run();
-        }
-    }
-
-    if (motor2 && motor2->isRunning())
-    {
-        if (digitalRead(SENSOR_INDUTIVO_MOTOR_2) || pararMotor2)
-        {
-            paraMotor2(motor2);
-        }
-        else
-        {
-            motor2->run();
+    } else {
+        if(valorLido2 > limiarSensor){
+            emMovimentoFalha = false;
         }
     }
 }

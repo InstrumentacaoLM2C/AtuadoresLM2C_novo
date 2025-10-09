@@ -14,7 +14,7 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       constanteCalibracao1, constanteCalibracao2, motorParou1;
 
   float qtdPulsosMotor1, qtdPulsosMotor2, qtdPulsosMotores1, qtdPulsosMotores2, velocidadeMaxima1, velocidadeMaxima2, pulsosMotor1,
-  pulsosMotor2, pulsoUnidirecional, velMotor1, velMotor2, velUnidirecional;
+      pulsosMotor2, pulsoUnidirecional, velMotor1, velMotor2, velUnidirecional;
 
   float receivedPulsesDistance1, receivedPulsesDistance2,
       receivedDelay1, receivedDelay2, zero_laser;
@@ -56,7 +56,7 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       }
       break;
     }
-  
+
     case DESLIGAR_MOTOR: // Se o primeiro caractere for a, desliga o motor
       if (motor == MOTOR_1)
       {
@@ -240,7 +240,7 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
         paraMotorSimultaneo(motor1, motor2, 1);
       }
 
-      else if(motor == 4)
+      else if (motor == 4)
       {
         paraMotorSimultaneo(motor3, motor4, 2);
       }
@@ -306,8 +306,11 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
     }
 
     case ATIVAR_SENSOR_INDUTIVO: // ativa a funcionalidade do sensor indutivo novamente
-      motorParou1 = 0;
-      Serial.print("\nSensor indutivo ativado"); // Printa a constante de calibração no app do VSCode
+      usarSensor = true;
+      break;
+
+    case DESATIVAR_SENSOR_INDUTIVO:
+      usarSensor = false;
       break;
 
     case ALTERAR_PARA_MOTOR_2: // Função para mudar qual motor está sendo utilizado.W
@@ -450,10 +453,10 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
 
       break;
     }
-    
+
     case MOVER_MOTOR_UNIVERSAL:
     {
-      
+
       String x = data.substring(1);
 
       // código para separar as strings
@@ -467,17 +470,16 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       int eigthSeparatorIndex = x.indexOf(';', seventhSeparatorIndex + 1);
       int ninethSeparatorIndex = x.indexOf(';', seventhSeparatorIndex + 1);
 
-
       // Extract substrings based on the positions of the separators
-      String pulsoBidirecional1 = x.substring(0, firstSeparatorIndex);                            
-      String velocidadeBidirecional1 = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex); 
-      String pulsoBidirecional2 = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex);      
-      String velocidadeBidirecional2 = x.substring(thirdSeparatorIndex + 1, fourthSeparatorIndex); 
-      String direcaoVertical = x.substring(fourthSeparatorIndex + 1, fifthSeparatorIndex);     
-      String direcaoHorizontal = x.substring(fifthSeparatorIndex + 1, sixthSeparatorIndex);     
+      String pulsoBidirecional1 = x.substring(0, firstSeparatorIndex);
+      String velocidadeBidirecional1 = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex);
+      String pulsoBidirecional2 = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex);
+      String velocidadeBidirecional2 = x.substring(thirdSeparatorIndex + 1, fourthSeparatorIndex);
+      String direcaoVertical = x.substring(fourthSeparatorIndex + 1, fifthSeparatorIndex);
+      String direcaoHorizontal = x.substring(fifthSeparatorIndex + 1, sixthSeparatorIndex);
       String pulsosUnidirecional = x.substring(sixthSeparatorIndex + 1, seventhSeparatorIndex);
-      String velocidadeUnidirecional = x.substring(seventhSeparatorIndex + 1, eigthSeparatorIndex);  
-      String direcaoUnidirecional = x.substring(eigthSeparatorIndex + 1, ninethSeparatorIndex);                           
+      String velocidadeUnidirecional = x.substring(seventhSeparatorIndex + 1, eigthSeparatorIndex);
+      String direcaoUnidirecional = x.substring(eigthSeparatorIndex + 1, ninethSeparatorIndex);
 
       digitalWrite(PIN_ENABLE_1, HIGH);
       digitalWrite(PIN_ENABLE_2, HIGH);
@@ -490,12 +492,12 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       velMotor2 = velocidadeBidirecional2.toFloat();
       pulsoUnidirecional = pulsosUnidirecional.toFloat();
       velUnidirecional = velocidadeUnidirecional.toFloat();
-      char direcaoMotor1= direcaoVertical[0];
-      char direcaoMotor2= direcaoHorizontal[0];
+      char direcaoMotor1 = direcaoVertical[0];
+      char direcaoMotor2 = direcaoHorizontal[0];
       char direcaoMotorUni = direcaoUnidirecional[0];
 
       moverUniversal(motor1, motor2, motor3, motor4, pulsosMotor1, pulsosMotor2, velMotor1, velMotor2, direcaoMotor1, direcaoMotor2,
-      pulsoUnidirecional, velUnidirecional, direcaoMotorUni);
+                     pulsoUnidirecional, velUnidirecional, direcaoMotorUni);
 
       break;
     }

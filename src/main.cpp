@@ -54,6 +54,9 @@ void loop() {
   VerificarSerial(motor1, motor2, motor3, motor4, velocidadeMaxima, aceleracaoMaxima, velocidade);
   
   if (emMovimento1) {
+    if(usarSensor){
+      sensorIndutivo(motor1, 1);
+    }
     motor1->run();
     if (motor1->distanceToGo() == 0) {
       emMovimento1 = false;
@@ -63,6 +66,9 @@ void loop() {
   }
 
   if (emMovimento2) {
+    if(usarSensor){
+      sensorIndutivo(motor2, 2);
+    }
     motor2->run();
     if (motor2->distanceToGo() == 0) {
       emMovimento2 = false;
@@ -72,6 +78,9 @@ void loop() {
   }
 
   if(emMovimentoSimultaneo) {
+    if(usarSensor){
+    sensorIndutivoSimultaneo(motor1, motor2, 1);
+    }
     motor1->run();
     motor2->run();
     if (motor1->distanceToGo() == 0 || motor2->distanceToGo() == 0){
@@ -83,6 +92,9 @@ void loop() {
   }
 
   if(emMovimentoFalha) {
+    if(usarSensor){
+    sensorIndutivoSimultaneo(motor3, motor4, 2);
+    }
     motor3->run();
     motor4->run();
     if (motor3->distanceToGo() == 0 || motor4->distanceToGo() == 0){

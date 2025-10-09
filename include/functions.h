@@ -36,9 +36,9 @@ void paraMotor1(AccelStepper* motor);
 
 void paraMotor2(AccelStepper* motor);
 
-void sensorIndutivo(AccelStepper* motor);
+void sensorIndutivo(AccelStepper* motor, int numMotor);
 
-void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2);
+void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int tipoMotor);
 
 void calibracao();
 
