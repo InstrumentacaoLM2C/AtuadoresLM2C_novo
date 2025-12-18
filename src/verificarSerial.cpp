@@ -2,12 +2,10 @@
 #include "../include/macros.h"
 #include "../include/globals.h"
 
-// nmhkjh
-
+// Função principal de processamento da porta Serial
 void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *motor3, AccelStepper *motor4, int velocidadeMaxima, int velocidade, int aceleracaoMaxima)
 {
-
-  // Definição de variáveis
+  // Definição de variáveis locais para armazenamento de dados recebidos e processados
   String posicao_calculadaStr1, posicao_calculadaStr2;
 
   int aceleracao1, aceleracao2, posicao_calculada1, posicao_calculada2, parar_calibracao,
@@ -19,30 +17,30 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
   float receivedPulsesDistance1, receivedPulsesDistance2,
       receivedDelay1, receivedDelay2, zero_laser;
 
+  // Variáveis estáticas e de estado de direção
   static int motor = 1;
   int direcao1 = 1;
   int direcao2 = 1;
   int direcaoMotor = 1;
 
+  // Verifica se existem bytes pendentes na leitura serial
   if (Serial.available())
   {
+    // Lê a string enviada pela interface (ex: LabVIEW) até o caractere terminador '#'
     String data = Serial.readStringUntil('#');
-    char digitoUm = data.charAt(0);
+    char digitoUm = data.charAt(0); // Identifica o comando principal pelo primeiro caractere
 
     switch (digitoUm)
-    { // Verifica as condições com base no primeiro caractere
-
-    case LIGAR_MOTOR:
-    { // Se o primeiro caractere for A, liga o motor
+    { 
+    case LIGAR_MOTOR: // Caso 'A': Ativa o driver do motor selecionado (pino ENABLE)
+    { 
       if (motor == MOTOR_1)
       {
         digitalWrite(PIN_ENABLE_1, HIGH);
-        // Serial.println("/Motor 1 ligado!");
       }
       else if (motor == MOTOR_2)
       {
         digitalWrite(PIN_ENABLE_2, HIGH);
-        // Serial.println("/Motor 2 ligado!");
       }
       else if (motor == MOTORES_SIMULTANEOS)
       {
@@ -57,16 +55,14 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       break;
     }
 
-    case DESLIGAR_MOTOR: // Se o primeiro caractere for a, desliga o motor
+    case DESLIGAR_MOTOR: // Caso 'a': Desativa o driver do motor selecionado (pino ENABLE)
       if (motor == MOTOR_1)
       {
         digitalWrite(PIN_ENABLE_1, LOW);
-        // Serial.println("/Motor 1 desligado!");
       }
       else if (motor == MOTOR_2)
       {
         digitalWrite(PIN_ENABLE_2, LOW);
-        // Serial.println("/Motor 2 desligado!");
       }
       else if (motor == MOTORES_SIMULTANEOS)
       {
@@ -80,17 +76,14 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       }
       break;
 
-    case MOVER_MOTOR_CIMA: // Se o primeiro caractere é C, move o motor para cima
-
+    case MOVER_MOTOR_CIMA: // Caso para definir a direção de subida
       if (motor == MOTOR_1)
       {
-        // Serial.println("c"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
         direcao1 = 1;
         direcaoMotor = 1;
       }
       else if (motor == MOTOR_2)
       {
-        // Serial.println("C"); // Printa a mensagem no aplicativo do vs code:: Direcão: Para cima
         direcao2 = 1;
         direcaoMotor = -1;
       }
@@ -101,17 +94,14 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       }
       break;
 
-    case MOVER_MOTOR_BAIXO: // Se o primeiro caractere é B, move o motor para baixo
-
+    case MOVER_MOTOR_BAIXO: // Caso para definir a direção de descida
       if (motor == MOTOR_1)
       {
-        // Serial.println(DIRECAO_MOTOR_1_BAIXO); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
         direcao1 = 1;
         direcaoMotor = 1;
       }
       else if (motor == MOTOR_2)
       {
-        // Serial.println(DIRECAO_MOTOR_2_BAIXO); // Printa a mensagem no aplicativo do vs code:: Direcão: Para baixo
         direcao2 = 1;
         direcaoMotor = -1;
       }
@@ -120,140 +110,93 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
         direcao1 = 1;
         direcao2 = 1;
       }
-
       break;
 
-    case QTD_PULSOS:
-    { // Se o primeiro caractere é P, envia a quantidade de pulsos
-      // a cada pulso se movimenta 0,6 mm -> conta: (1,8 \ (3 * 4)) * 4mm do passo
+    case QTD_PULSOS: // Caso 'P': Recebe o valor numérico para o deslocamento
+    { 
       String info_qtd_pulsos = data.substring(1);
       if (motor == '1')
       {
-        qtdPulsosMotor1 = info_qtd_pulsos.toFloat(); // value for the steps
-        // Serial.print("/Pulsos motor 1: ");
-        // Serial.println(receivedPulsesDistance1);
+        qtdPulsosMotor1 = info_qtd_pulsos.toFloat(); 
       }
       else if (motor == '2')
       {
-        qtdPulsosMotor2 = info_qtd_pulsos.toFloat(); // value for the steps
-        // Serial.print("/Pulsos motor 2: ");
-        // Serial.println(receivedPulsesDistance2);
+        qtdPulsosMotor2 = info_qtd_pulsos.toFloat(); 
       }
       break;
     }
-    case ACELERAR_MOTOR: // First character is an G = motor accelerates
+
+    case ACELERAR_MOTOR: // Caso 'G': Inicia movimento com rampa de aceleração
       if (motor == '1')
       {
-        // Serial.println("a"); // Printa a mensagem no aplicativo do vs code:: O motor 1 está se movendo com aceleração!
         moverAcelerado(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor);
       }
       else if (motor == '2')
       {
-        // Serial.println("A"); // Printa a mensagem no aplicativo do vs code: O motor 2 está se movendo com aceleração!
         moverAcelerado(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor);
       }
-
       break;
 
-    case MSG_MOTOR_MOVENDO_COM_ACELERACAO:
-      if (motor == '1')
-      {
-        // Serial.println("a"); // Printa a mensagem no aplicativo do vs code:: O motor 1 está se movendo com aceleração!
-        aceleracao1 = 1;
-      }
-      else if (motor == '2')
-      {
-        // Serial.println("Entrei na função do motor 2");
-        // Serial.println("A"); // Printa a mensagem no aplicativo do vs code: O motor 2 está se movendo com aceleração!
-        aceleracao2 = 1;
-      }
+    case MSG_MOTOR_MOVENDO_COM_ACELERACAO: // Sinaliza flag de aceleração ativa
+      if (motor == '1') aceleracao1 = 1;
+      else if (motor == '2') aceleracao2 = 1;
       break;
 
-    case MSG_MOTOR_MOVENDO_SEM_ACELERACAO:
-      if (motor == '1')
-      {
-        // Serial.println("a"); // Printa a mensagem no aplicativo do vs code:: O motor 1 está se movendo sem aceleração!
-        aceleracao1 = 0;
-      }
-      else if (motor == '2')
-      {
-        // Serial.println("A"); // Printa a mensagem no aplicativo do vs code: O motor 2 está se movendo sem aceleração!
-        aceleracao2 = 0;
-      }
+    case MSG_MOTOR_MOVENDO_SEM_ACELERACAO: // Sinaliza flag de aceleração inativa
+      if (motor == '1') aceleracao1 = 0;
+      else if (motor == '2') aceleracao2 = 0;
       break;
 
-    case ATIVAR_MOTOR_VEL_CTE: // First character is an H = motor spins with constant speed
+    case ATIVAR_MOTOR_VEL_CTE: // Caso 'H': Inicia movimento com velocidade constante
       if (motor == '1')
       {
-        // Serial.println("/O motor 1 se move com velocidade constante!");
         moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcaoMotor, 1);
       }
       else if (motor == '2')
       {
-        // Serial.println("/O motor 2 se move com velocidade constante!");
         moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcaoMotor, 2);
       }
       break;
 
-    case DEFINIR_VELOCIDADE:
-    { // First character is an V = set velocity
+    case DEFINIR_VELOCIDADE: // Caso 'V': Ajusta o valor da velocidade em passos/segundo
+    { 
       String x = data.substring(1);
       float y = x.toFloat();
       if (200 < y < 8000)
       {
-        if (motor == '1')
-        {
-          receivedDelay1 = y;
-          // Serial.println("/Velocidade do motor 1: " + x + " Pulsos por segundo");
-        }
-        else if (motor == '2')
-        {
-          // Serial.println("/Velocidade do motor 2: " + x + " Pulsos por segundo");
-
-          receivedDelay2 = y;
-        }
+        if (motor == '1') receivedDelay1 = y;
+        else if (motor == '2') receivedDelay2 = y;
       }
-      else
-      {
-        // Serial.println("Q"); //Printa a mensagem no aplicativo do vs code: "Valor de velocidade inválido! Insira um valor entre 200 e 8000 pulsos/segundo
-      }
-
       break;
     }
-    case PARAR_MOTOR: // para o motor, #define PARAR_MOTOR 'n' no arquivo macros.h
 
+    case PARAR_MOTOR: // Caso 'n': Interrompe o motor imediatamente
       if (motor == 1)
       {
-        // paraMotor(motor1);
         paraMotor1(motor1);
         pararMotor1 = true;
       }
       else if (motor == 2)
       {
-        // paraMotor(motor2);
         paraMotor2(motor2);
         pararMotor2 = true;
       }
       else if (motor == 3)
       {
-        // paraMotorSimultaneo(motor1, motor2);
         paraMotorSimultaneo(motor1, motor2, 1);
       }
-
       else if (motor == 4)
       {
         paraMotorSimultaneo(motor3, motor4, 2);
       }
-
       break;
 
-    case PARAR_CALIBRACAO: // para calibração
+    case PARAR_CALIBRACAO: // Interrompe processo de calibração
       parar_calibracao = 1;
-
       break;
 
-    case POSICAO_MOTOR_1:
-    { //  Insere um valor para a posição calculada do primeiro motor.
+    case POSICAO_MOTOR_1: // Recebe posição calculada para o motor 1
+    { 
       delayMicroseconds(1000);
       String x = data.substring(1);
       posicao_calculada1 = x.toFloat();
@@ -261,145 +204,118 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       posicao_calculadaStr1 = String(posicao_calculada1);
       break;
     }
-    case POSICAO_MOTOR_2:
-    { //  Insere um valor para a posição calculada do segundo motor.
+
+    case POSICAO_MOTOR_2: // Recebe posição calculada para o motor 2
+    { 
       delayMicroseconds(1000);
       String x = data.substring(1);
       posicao_calculada2 = x.toFloat();
       delayMicroseconds(1000);
       posicao_calculadaStr2 = String(posicao_calculada2);
-      // Serial.println('P'+ posicao_calculadaStr2);
       break;
     }
-    case CONFIGURAR_ZERO_LASER:
-    { // sets intercept of the laser
+
+    case CONFIGURAR_ZERO_LASER: // Ajusta o ponto zero do sensor laser
+    { 
       String x = data.substring(1);
       zero_laser = x.toFloat();
       break;
     }
 
-    case INICIAR_CALIBRACAO: // Inicia o processo de calibração
+    case INICIAR_CALIBRACAO: // Inicia rotina de calibração
       calibracao();
-
       break;
 
-    case INSERIR_CONSTANTES_CALIBRACAO:
-    { // Insere constante de calibração dos motores
+    case INSERIR_CONSTANTES_CALIBRACAO: // Recebe constantes para cálculos de precisão
+    { 
       String x = data.substring(1);
-      if (motor == 1)
-      {
-        constanteCalibracao1 = x.toFloat();
-      }
-      else if (motor == 2)
-      {
-        constanteCalibracao2 = x.toFloat();
-      }
+      if (motor == 1) constanteCalibracao1 = x.toFloat();
+      else if (motor == 2) constanteCalibracao2 = x.toFloat();
       else if (motor == 3)
       {
         constanteCalibracao1 = x.toFloat();
         constanteCalibracao2 = x.toFloat();
       }
-
-      Serial.print('w'); // Printa a constante de calibração no app do VSCode
+      Serial.print('w'); 
       Serial.println(x);
       break;
     }
 
-    case ATIVAR_SENSOR_INDUTIVO: // ativa a funcionalidade do sensor indutivo novamente
+    case ATIVAR_SENSOR_INDUTIVO: // Ativa monitoramento de fim de curso via sensor
       usarSensor = true;
       break;
 
-    case DESATIVAR_SENSOR_INDUTIVO:
+    case DESATIVAR_SENSOR_INDUTIVO: // Desativa monitoramento de fim de curso via sensor
       usarSensor = false;
       break;
 
-    case ALTERAR_PARA_MOTOR_2: // Função para mudar qual motor está sendo utilizado.W
+    case ALTERAR_PARA_MOTOR_2: // Seleciona Motor 2 para controle
       motor = 2;
-      // Serial.println('u'); //Segundo motor sendo operado!
       break;
 
-    case ALTERAR_PARA_MOTOR_1: // Função para mudar qual motor está sendo utilizado.
+    case ALTERAR_PARA_MOTOR_1: // Seleciona Motor 1 para controle
       motor = 1;
-      // Serial.println('U');//Primeiro motor sendo operado!
       break;
 
-    case SUBSIDENCIA:
-      // subsidencia(); // Função que movimenta o motor para frente e para trás (2 voltas completas) ativando o mecanismo de subsidência
+    case SUBSIDENCIA: // Espaço reservado para função de subsidência
       break;
 
-    case ALTERAR_PARA_MOTORES_SIMULTANEOS:
+    case ALTERAR_PARA_MOTORES_SIMULTANEOS: // Seleciona modo de operação Motores 1 & 2
     {
       motor = MOTORES_SIMULTANEOS;
-      // Serial.println("Motores simultaneos sendo operados");
       break;
     }
 
-    case ALTERAR_PARA_MOTORES_FALHA:
+    case ALTERAR_PARA_MOTORES_FALHA: // Seleciona modo de operação Motores 3 & 4
     {
       motor = MOTORES_FALHA;
       break;
     }
 
-    case ENVIAR_CONFIG_COMPLETA:
-    { // recebe todas as informações do motor de uma vez e aciona o motor 'T'
+    case ENVIAR_CONFIG_COMPLETA: // Caso 'T': Recebe string complexa formatada com ';'
+    { 
       String x = data.substring(1);
-
-      // código para separar as strings
       int firstSeparatorIndex = x.indexOf(';');
       int secondSeparatorIndex = x.indexOf(';', firstSeparatorIndex + 1);
       int thirdSeparatorIndex = x.indexOf(';', secondSeparatorIndex + 1);
 
-      // Extract substrings based on the positions of the separators
-      String pulso = x.substring(0, firstSeparatorIndex);                               // "primeiro numero"
-      String velocidade = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex);   // "segundo numero"
-      String direcaoMotor = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex); // "caracter B ou C"
-      String mover = x.substring(thirdSeparatorIndex + 1);                              // "caracter H ou x"
+      String pulso = x.substring(0, firstSeparatorIndex);
+      String velocidade = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex);
+      String direcaoMotor = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex);
+      String mover = x.substring(thirdSeparatorIndex + 1);
 
       char direcao = direcaoMotor[0];
 
-      // Exemplo T2000;200;B;H#
       if (motor == 1)
       {
         qtdPulsosMotor1 = pulso.toFloat();
         velocidadeMaxima = velocidade.toFloat();
-
-        if (mover == "H")
-        {
-          moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcao, 1);
-        }
+        if (mover == "H") moverUniforme(motor1, qtdPulsosMotor1, velocidadeMaxima, direcao, 1);
       }
       else if (motor == 2)
       {
-        qtdPulsosMotor2 = pulso.toFloat(); // value for the steps
-
+        qtdPulsosMotor2 = pulso.toFloat();
         velocidadeMaxima = velocidade.toFloat();
-
-        if (mover == "H")
-        {
-          moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcao, 2);
-        }
+        if (mover == "H") moverUniforme(motor2, qtdPulsosMotor2, velocidadeMaxima, direcao, 2);
       }
       break;
     }
 
-    case MOVER_MOTORES_SIMULTANEOS:
+    case MOVER_MOTORES_SIMULTANEOS: // Comando 'W': Movimenta motores 1 e 2 simultaneamente com parâmetros individuais
     {
       String x = data.substring(1);
-
-      // código para separar as strings
       int firstSeparatorIndex = x.indexOf(';');
       int secondSeparatorIndex = x.indexOf(';', firstSeparatorIndex + 1);
       int thirdSeparatorIndex = x.indexOf(';', secondSeparatorIndex + 1);
       int fourthSeparatorIndex = x.indexOf(';', thirdSeparatorIndex + 1);
       int fifthSeparatorIndex = x.indexOf(';', fourthSeparatorIndex + 1);
 
-      // Extract substrings based on the positions of the separators
-      String pulso1 = x.substring(0, firstSeparatorIndex);                             // "primeiro numero"
-      String velocidade1 = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex); // "segundo numero"
-      String pulso2 = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex);      // "terceiro numero"
-      String velocidade2 = x.substring(thirdSeparatorIndex + 1, fourthSeparatorIndex); // "quarto numero"
-      String direcao = x.substring(fourthSeparatorIndex + 1, fifthSeparatorIndex);     // "caracter B ou C"
-      String mover = x.substring(fifthSeparatorIndex + 1);                             // "caracter H ou x
+      String pulso1 = x.substring(0, firstSeparatorIndex);
+      String velocidade1 = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex);
+      String pulso2 = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex);
+      String velocidade2 = x.substring(thirdSeparatorIndex + 1, fourthSeparatorIndex);
+      String direcao = x.substring(fourthSeparatorIndex + 1, fifthSeparatorIndex);
+      String mover = x.substring(fifthSeparatorIndex + 1);
 
       digitalWrite(PIN_ENABLE_1, HIGH);
       digitalWrite(PIN_ENABLE_2, HIGH);
@@ -414,28 +330,24 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       {
         moverSimultaneo(motor1, motor2, qtdPulsosMotores1, qtdPulsosMotores2, velocidadeMaxima1, velocidadeMaxima2, direcaoChar, 1);
       }
-
       break;
     }
 
-    case MOVER_MOTORES_FALHA:
+    case MOVER_MOTORES_FALHA: // Comando 'L': Movimenta motores 3 e 4 simultaneamente
     {
       String x = data.substring(1);
-
-      // código para separar as strings
       int firstSeparatorIndex = x.indexOf(';');
       int secondSeparatorIndex = x.indexOf(';', firstSeparatorIndex + 1);
       int thirdSeparatorIndex = x.indexOf(';', secondSeparatorIndex + 1);
       int fourthSeparatorIndex = x.indexOf(';', thirdSeparatorIndex + 1);
       int fifthSeparatorIndex = x.indexOf(';', fourthSeparatorIndex + 1);
 
-      // Extract substrings based on the positions of the separators
-      String pulso1 = x.substring(0, firstSeparatorIndex);                             // "primeiro numero"
-      String velocidade1 = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex); // "segundo numero"
-      String pulso2 = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex);      // "terceiro numero"
-      String velocidade2 = x.substring(thirdSeparatorIndex + 1, fourthSeparatorIndex); // "quarto numero"
-      String direcao = x.substring(fourthSeparatorIndex + 1, fifthSeparatorIndex);     // "caracter B ou C"
-      String mover = x.substring(fifthSeparatorIndex + 1);                             // "caracter H ou x
+      String pulso1 = x.substring(0, firstSeparatorIndex);
+      String velocidade1 = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex);
+      String pulso2 = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex);
+      String velocidade2 = x.substring(thirdSeparatorIndex + 1, fourthSeparatorIndex);
+      String direcao = x.substring(fourthSeparatorIndex + 1, fifthSeparatorIndex);
+      String mover = x.substring(fifthSeparatorIndex + 1);
 
       digitalWrite(PIN_ENABLE_3, HIGH);
       digitalWrite(PIN_ENABLE_4, HIGH);
@@ -450,16 +362,12 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       {
         moverSimultaneo(motor3, motor4, qtdPulsosMotores1, qtdPulsosMotores2, velocidadeMaxima1, velocidadeMaxima2, direcaoChar, 2);
       }
-
       break;
     }
 
-    case MOVER_MOTOR_UNIVERSAL:
+    case MOVER_MOTOR_UNIVERSAL: // Comando 'Z': Controle coordenado dos 4 motores ao mesmo tempo
     {
-
       String x = data.substring(1);
-
-      // código para separar as strings
       int firstSeparatorIndex = x.indexOf(';');
       int secondSeparatorIndex = x.indexOf(';', firstSeparatorIndex + 1);
       int thirdSeparatorIndex = x.indexOf(';', secondSeparatorIndex + 1);
@@ -470,7 +378,6 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
       int eigthSeparatorIndex = x.indexOf(';', seventhSeparatorIndex + 1);
       int ninethSeparatorIndex = x.indexOf(';', seventhSeparatorIndex + 1);
 
-      // Extract substrings based on the positions of the separators
       String pulsoBidirecional1 = x.substring(0, firstSeparatorIndex);
       String velocidadeBidirecional1 = x.substring(firstSeparatorIndex + 1, secondSeparatorIndex);
       String pulsoBidirecional2 = x.substring(secondSeparatorIndex + 1, thirdSeparatorIndex);
@@ -498,7 +405,6 @@ void VerificarSerial(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *m
 
       moverUniversal(motor1, motor2, motor3, motor4, pulsosMotor1, pulsosMotor2, velMotor1, velMotor2, direcaoMotor1, direcaoMotor2,
                      pulsoUnidirecional, velUnidirecional, direcaoMotorUni);
-
       break;
     }
     }
