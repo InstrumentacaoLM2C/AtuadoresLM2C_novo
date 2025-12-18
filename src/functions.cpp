@@ -154,21 +154,41 @@ void moverSimultaneo(AccelStepper *motor1, AccelStepper *motor2, float distancia
     motor1->enableOutputs(); // Ativa os motores
     motor2->enableOutputs(); // Ativa os motores
 
-    if (direcao == 'B')
-    { // Se direção for 1
-        resposta = "horario";
-        posicaoDesejada1 = posicaoInicial1 - distancia1; // Motor 1
-        posicaoDesejada2 = posicaoInicial2 - distancia2; // Motor 2
-    }
-    else if (direcao == 'C')
-    { // Se direção for 0
-        resposta = "antihorario";
-        posicaoDesejada1 = posicaoInicial1 + distancia1; // Motor 1
-        posicaoDesejada2 = posicaoInicial2 + distancia2; // Motor 2
-    }
-    else
+    if (tipoMotor == 1)
     {
-        return; // Se direção inválida, sai da função
+        if (direcao == 'B')
+        { // Se direção for 1
+            resposta = "horario";
+            posicaoDesejada1 = posicaoInicial1 - distancia1; // Motor 1
+            posicaoDesejada2 = posicaoInicial2 - distancia2; // Motor 2
+        }
+        else if (direcao == 'C')
+        { // Se direção for 0
+            resposta = "antihorario";
+            posicaoDesejada1 = posicaoInicial1 + distancia1; // Motor 1
+            posicaoDesejada2 = posicaoInicial2 + distancia2; // Motor 2
+        }
+        else
+        {
+            return; // Se direção inválida, sai da função
+        }
+    } else if(tipoMotor == 2){
+        if (direcao == 'B')
+        { // Se direção for 1
+            resposta = "horario";
+            posicaoDesejada1 = posicaoInicial1 - distancia1; // Motor 1
+            posicaoDesejada2 = posicaoInicial2 + distancia2; // Motor 2
+        }
+        else if (direcao == 'C')
+        { // Se direção for 0
+            resposta = "antihorario";
+            posicaoDesejada1 = posicaoInicial1 + distancia1; // Motor 1
+            posicaoDesejada2 = posicaoInicial2 - distancia2; // Motor 2
+        }
+        else
+        {
+            return; // Se direção inválida, sai da função
+        }
     }
 
     motor1->setAcceleration(5000); // Define aceleração
@@ -309,33 +329,44 @@ void desabilitarMotor(AccelStepper *motor, int enablePin)
     }
 }
 
-
-void sensorIndutivo(AccelStepper* motor, int numMotor) {
+void sensorIndutivo(AccelStepper *motor, int numMotor)
+{
     int valorLido1 = analogRead(SENSOR_INDUTIVO_MOTOR_1);
     int valorLido2 = analogRead(SENSOR_INDUTIVO_MOTOR_2);
 
-    if(numMotor == 1){
-        if(valorLido1 > limiarSensor){
+    if (numMotor == 1)
+    {
+        if (valorLido1 > limiarSensor)
+        {
             emMovimento1 = false;
         }
-    } else {
-        if(valorLido2 > limiarSensor){
+    }
+    else
+    {
+        if (valorLido2 > limiarSensor)
+        {
             emMovimento2 = false;
         }
     }
 }
 
-void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2, int tipoMotor) {
+void sensorIndutivoSimultaneo(AccelStepper *motor1, AccelStepper *motor2, int tipoMotor)
+{
 
     int valorLido1 = analogRead(SENSOR_INDUTIVO_MOTOR_1);
     int valorLido2 = analogRead(SENSOR_INDUTIVO_MOTOR_2);
 
-    if(tipoMotor == 1){
-        if(valorLido1 > limiarSensor){
+    if (tipoMotor == 1)
+    {
+        if (valorLido1 > limiarSensor)
+        {
             emMovimentoSimultaneo = false;
         }
-    } else {
-        if(valorLido2 > limiarSensor){
+    }
+    else
+    {
+        if (valorLido2 > limiarSensor)
+        {
             emMovimentoFalha = false;
         }
     }
