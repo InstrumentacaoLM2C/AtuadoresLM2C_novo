@@ -3,151 +3,206 @@
 #include "../include/globals.h"
 #include <AccelStepper.h>
 
+/**
+ * @brief Cria e inicializa dinamicamente um objeto AccelStepper.
+ * @return Ponteiro para o motor criado ou nullptr em caso de falha.
+ */
+AccelStepper *CriarMotor(int stepPin, int dirPin, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade)
+{
+    // Aloca dinamicamente o objeto usando o driver do tipo DRIVER (Step/Dir)
+    AccelStepper *motor = new AccelStepper(AccelStepper::DRIVER, stepPin, dirPin);
 
-AccelStepper* CriarMotor(int stepPin, int dirPin, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade) {
-    // Aloca dinamicamente um objeto AccelStepper
-    AccelStepper* motor = new AccelStepper(AccelStepper::DRIVER, stepPin, dirPin);
-    
-    if (!motor) {
-        Serial.println("Erro: Falha ao alocar memória para o motor!");
-        return nullptr; // Retorna nullptr em caso de falha na alocação
+    if (!motor)
+    {
+        return nullptr; // Falha na alocação de memória
     }
 
-    // Configura os pinos do motor
+    // Aplica as configurações iniciais de pinagem e performance
     ConfigurarMotor(motor, enablePin, velocidadeMaxima, aceleracao, velocidade);
 
-    return motor; // Retorna o ponteiro para o motor criado
+    return motor;
 }
 
-// Configura os parâmetros do motor e habilita o driver.
-
-void ConfigurarMotor(AccelStepper* motor, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade) {
+/**
+ * @brief Configura pinos de hardware e parâmetros iniciais de movimento.
+ */
+void ConfigurarMotor(AccelStepper *motor, int enablePin, int velocidadeMaxima, int aceleracao, int velocidade)
+{
     pinMode(enablePin, OUTPUT);
-    digitalWrite(enablePin, LOW); // Habilita o motor
+    digitalWrite(enablePin, LOW); // Garante motor inicialmente desabilitado
 
-    motor->setMaxSpeed(velocidadeMaxima); // Velocidade máxima em passos/s
-    motor->setAcceleration(aceleracao);   // Aceleração em passos/s²
-    motor->setSpeed(velocidade);          // Velocidade inicial em passos/s
+    motor->setMaxSpeed(velocidadeMaxima); // Limite de velocidade (passos/s)
+    motor->setAcceleration(aceleracao);   // Limite de aceleração (passos/s²)
+    motor->setSpeed(velocidade);          // Velocidade de regime inicial
 }
 
-// Função para mover um motor (NÃO ESTÁ SENDO UTILIZADA)
-int moverMotor(AccelStepper* motor, long distancia) {
-    if (!motor) { // Verifica se o ponteiro do motor é válido
+/**
+ * @brief Função para mover um motor de forma bloqueante.
+ * @note NÃO ESTÁ SENDO UTILIZADA no fluxo principal.
+ */
+int moverMotor(AccelStepper *motor, long distancia)
+{
+    if (!motor)
+    {
         return ERROR_MOTOR_NAO_SELECIONADO;
     }
-    motor->move(distancia); // Define a posição alvo
-    while (motor->distanceToGo() != 0) { // Executa o movimento
-        motor->run();
+    motor->move(distancia); // Define alvo relativo
+    while (motor->distanceToGo() != 0)
+    {
+        motor->run(); // Executa o movimento até o fim (bloqueante)
     }
     return OK;
 }
 
-// Função para mover o motor com aceleraçao
-void moverAcelerado(AccelStepper* motor, long distancia, int velocidadeMaxima, int direcao) {
-    if (!motor) { // Verifica se o ponteiro do motor é válido
-        return; // Retorna sem fazer nada se o ponteiro for inválido
-    }
+/**
+ * @brief Move o motor utilizando rampas de aceleração.
+ */
+void moverAcelerado(AccelStepper *motor, long distancia, int velocidadeMaxima, int direcao)
+{
+    if (!motor) return;
 
     long posicaoInicial = motor->currentPosition();
     long posicaoFinal;
 
-    motor->setAcceleration(1000); // Define a aceleração em passos por segundo ao quadrado
-    motor->setMaxSpeed(abs(velocidadeMaxima)); // Define a velocidade máxima em passos por segundo
-    
-    if (direcao == 1) {
+    motor->setAcceleration(1000);              
+    motor->setMaxSpeed(abs(velocidadeMaxima)); 
+
+    // Define a posição final com base no multiplicador de direção
+    if (direcao == 1)
+    {
         motor->setSpeed(abs(velocidadeMaxima));
         posicaoFinal = posicaoInicial + distancia;
-    } else if (direcao == -1) {
+    }
+    else if (direcao == -1)
+    {
         motor->setSpeed(-abs(velocidadeMaxima));
         posicaoFinal = posicaoInicial - distancia;
-    } else {
-        return; // Direção inválida, sai da função
+    }
+    else
+    {
+        return; 
     }
 
     motor->moveTo(posicaoFinal);
 
-    while (motor->currentPosition() != posicaoFinal) {
+    // Loop bloqueante até atingir a posição final
+    while (motor->currentPosition() != posicaoFinal)
+    {
         motor->run();
     }
 }
 
+/**
+ * @brief Inicia o movimento uniforme (não bloqueante) para um motor específico.
+ * @param numMotor Identificador do motor (1 ou 2) para atualizar flags globais.
+ */
+void moverUniforme(AccelStepper *motor, double distancia, int velocidade, char direcao, int numMotor)
+{
+    if (!motor) return;
 
-
-// Função para mover o motor de forma acelerada
-void moverUniforme(AccelStepper* motor, long distancia, int velocidade, int direcao){
-    if (!motor) {
-        return;
-    }
-
-    long posicaoInicial = motor->currentPosition();
-    long posicaoDesejada;
+    double posicaoInicial = motor->currentPosition();
+    double posicaoDesejada;
 
     pararMotorSimultaneo = false;
 
-    motor->setMaxSpeed(abs(velocidade));  // Define a velocidade máxima
+    motor->setMaxSpeed(abs(velocidade)); 
+    motor->enableOutputs(); // Ativa os drivers de potência
 
-    motor->enableOutputs();  // Ativa os motores
-
-    if (direcao == 1) {  // Se direção for "C"
-        posicaoDesejada = posicaoInicial - distancia;  // Motor 1
-        
-    } else if (direcao == 0) {  // Se direção for "B"
-        posicaoDesejada = posicaoInicial + distancia;  // Motor 1
-        
-    } else {
-        return; // Se direção inválida, sai da função
+    // Lógica de direção baseada nos caracteres 'B' (Baixo) e 'C' (Cima)
+    if (direcao == 'B')
+    {
+        posicaoDesejada = posicaoInicial - distancia; 
+    }
+    else if (direcao == 'C')
+    {
+        posicaoDesejada = posicaoInicial + distancia; 
+    }
+    else
+    {
+        return; 
     }
 
-    motor->setAcceleration(5000);  // Define aceleração
+    motor->setAcceleration(5000); 
+    motor->moveTo(posicaoDesejada); 
 
-    motor->moveTo(posicaoDesejada);  // Move motor 1 para a posição desejada
-
-    Serial.println("Movendo motor...");
-
-    // Loop para mover os motores até que ambos atinjam suas posições desejadas
-    while (motor->distanceToGo() != 0) {
-
-        sensorIndutivo(motor);
-        if (pararMotor) {
-            Serial.println("Parando motor...");
-            break;
-        }
-
-        // Verifica se há comandos de parada
-        if (Serial.available()) {
-            char comando = Serial.read();
-            if (comando == 'n') {
-                pararMotorSimultaneo = true;
-                Serial.println("Comando de parada recebido!");
-                break;
-            }
-        }
-
-        motor->run();  // Executa o movimento do motor
-    }
-
-    // Para os motores ao terminar o movimento
-    motor->stop();
-
-    // Zera as acelerações e as velocidades
-    motor->setAcceleration(0);
-    motor->setSpeed(0);
-
-    // Reseta a posição dos motores
-    motor->setCurrentPosition(0);
-
-    // Desativa os motores após o movimento
-    motor->disableOutputs();
-
-    Serial.println("y");
+    // Ativa flags que serão processadas no loop() do main.cpp
+    if (numMotor == 1) emMovimento1 = true;
+    if (numMotor == 2) emMovimento2 = true;
 }
 
+/**
+ * @brief Gerencia o movimento coordenado de dois motores simultaneamente.
+ * @param tipoMotor Define se é o par principal (1) ou o par de falha (2).
+ */
+void moverSimultaneo(AccelStepper *motor1, AccelStepper *motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, char direcao, int tipoMotor)
+{
+    if ((!motor1) || (!motor2)) return;
 
-void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia1, float distancia2, float velocidadeMaxima1, float velocidadeMaxima2, String direcao) {
-    // Verifica se os motores são válidos
-    if ((!motor1) || (!motor2)) {
-        return;
+    double posicaoInicial1 = motor1->currentPosition();
+    double posicaoInicial2 = motor2->currentPosition();
+    double posicaoDesejada1, posicaoDesejada2;
+
+    // Reseta flags de interrupção
+    if (tipoMotor == 1) pararMotorSimultaneo = false;
+    else if (tipoMotor == 2) pararMotorFalha = false;
+
+    motor1->setMaxSpeed(abs(velocidadeMaxima1));
+    motor2->setMaxSpeed(abs(velocidadeMaxima2));
+
+    motor1->enableOutputs();
+    motor2->enableOutputs();
+
+    // Lógica de direção para o par Principal (Tipo 1)
+    if (tipoMotor == 1)
+    {
+        if (direcao == 'B')
+        {
+            posicaoDesejada1 = posicaoInicial1 - distancia1;
+            posicaoDesejada2 = posicaoInicial2 - distancia2;
+        }
+        else if (direcao == 'C')
+        {
+            posicaoDesejada1 = posicaoInicial1 + distancia1;
+            posicaoDesejada2 = posicaoInicial2 + distancia2;
+        }
+        else return;
+    } 
+    // Lógica de direção para o par de Falha (Tipo 2)
+    else if(tipoMotor == 2)
+    {
+        if (direcao == 'B')
+        {
+            posicaoDesejada1 = posicaoInicial1 - distancia1;
+            posicaoDesejada2 = posicaoInicial2 + distancia2;
+        }
+        else if (direcao == 'C')
+        {
+            posicaoDesejada1 = posicaoInicial1 + distancia1;
+            posicaoDesejada2 = posicaoInicial2 - distancia2;
+        }
+        else return;
     }
+
+    motor1->setAcceleration(5000);
+    motor2->setAcceleration(5000);
+
+    motor1->moveTo(posicaoDesejada1);
+    motor2->moveTo(posicaoDesejada2);
+
+    // Sinaliza movimento para o loop principal
+    if (tipoMotor == 1) emMovimentoSimultaneo = true;
+    else if (tipoMotor == 2) emMovimentoFalha = true;
+}
+
+/**
+ * @brief Função experimental para controle dos 4 motores ao mesmo tempo.
+ * @note Atualmente apenas para testes e aplicações futuras.
+ */
+void moverUniversal(AccelStepper *motor1, AccelStepper *motor2, AccelStepper *motor3, AccelStepper *motor4,
+                    float distancia1, float distancia2, float velocidade1, float velocidade2, char direcao1, char direcao2,
+                    float distanciaUnidrecional, float velocidadeUnidirecional, char direcaoUnidirecional)
+{
+    if ((!motor1) || (!motor2) || (!motor3) || (!motor4)) return;
 
     double posicaoInicial1 = motor1->currentPosition();
     double posicaoInicial2 = motor2->currentPosition();
@@ -155,157 +210,129 @@ void moverSimultaneo(AccelStepper* motor1, AccelStepper* motor2, float distancia
 
     pararMotorSimultaneo = false;
 
-    motor1->setMaxSpeed(abs(velocidadeMaxima1));  // Define a velocidade máxima
-    motor2->setMaxSpeed(abs(velocidadeMaxima2));  // Define a velocidade máxima
+    motor1->setMaxSpeed(abs(velocidade1));
+    motor2->setMaxSpeed(abs(velocidade2));
+    motor3->setMaxSpeed(abs(velocidadeUnidirecional));
+    motor4->setMaxSpeed(abs(velocidadeUnidirecional));
 
-    motor1->enableOutputs();  // Ativa os motores
-    motor2->enableOutputs();  // Ativa os motores
+    motor1->enableOutputs();
+    motor2->enableOutputs();
+    motor3->enableOutputs();
+    motor4->enableOutputs();
 
-    if (direcao.equals("C")) {  // Se direção for "C"
-        posicaoDesejada1 = posicaoInicial1 - distancia1;  // Motor 1
-        posicaoDesejada2 = posicaoInicial2 - distancia2;  // Motor 2
-    } else if (direcao.equals("B")) {  // Se direção for "B"
-        posicaoDesejada1 = posicaoInicial1 + distancia1;  // Motor 1
-        posicaoDesejada2 = posicaoInicial2 + distancia2;  // Motor 2
-    } else {
-        return; // Se direção inválida, sai da função
+    if (direcao1 == 'B')
+    {
+        posicaoDesejada1 = posicaoInicial1 - distancia1;
+        posicaoDesejada2 = posicaoInicial2 - distancia2;
     }
-
-    motor1->setAcceleration(5000);  // Define aceleração
-    motor2->setAcceleration(5000);  // Define aceleração
-
-    motor1->moveTo(posicaoDesejada1);  // Move motor 1 para a posição desejada
-    motor2->moveTo(posicaoDesejada2);  // Move motor 2 para a posição desejada
-
-    Serial.println("Movendo motores...");
-
-    // Loop para mover os motores até que ambos atinjam suas posições desejadas
-    while ((motor1->distanceToGo() != 0 || motor2->distanceToGo() != 0)) {
-        sensorIndutivoSimultaneo(motor1, motor2);
-
-        if (pararMotorSimultaneo) {
-            Serial.println("Parando motores...");
-            break;
-        }
-
-        // Verifica se há comandos de parada
-        if (Serial.available()) {
-            char comando = Serial.read();
-            if (comando == 'n') {
-                pararMotorSimultaneo = true;
-                Serial.println("Comando de parada recebido!");
-                break;
-            }
-        }
-
-        motor1->run();  // Executa o movimento do motor 1
-        motor2->run();  // Executa o movimento do motor 2
+    else if (direcao1 == 'C')
+    {
+        posicaoDesejada1 = posicaoInicial1 + distancia1;
+        posicaoDesejada2 = posicaoInicial2 + distancia2;
     }
+    else return;
 
-    // Para os motores ao terminar o movimento
-    motor1->stop();
-    motor2->stop();
+    motor1->setAcceleration(5000);
+    motor2->setAcceleration(5000);
 
-    // Zera as acelerações e as velocidades
-    motor1->setAcceleration(0);
-    motor2->setAcceleration(0);
-    motor1->setSpeed(0);
-    motor2->setSpeed(0);
+    motor1->moveTo(posicaoDesejada1);
+    motor2->moveTo(posicaoDesejada2);
 
-    // Reseta a posição dos motores
-    motor1->setCurrentPosition(0);
-    motor2->setCurrentPosition(0);
-
-    // Desativa os motores após o movimento
-    motor1->disableOutputs();
-    motor2->disableOutputs();
-
-    digitalWrite(PIN_ENABLE_1, HIGH);
-    digitalWrite(PIN_ENABLE_2, HIGH); // >>>>>>>>>TESTAR COMO FAZER O MOTOR DESACOPLAR 02/04/2025<<<<<<<<<<<<<<<<<<<<<
-
-    Serial.println("y");
+    emMovimentoSimultaneo = true;
 }
 
-void calibracao(){}
+void calibracao() {} // Espaço reservado para rotina de calibração
 
-void paraMotorSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
+/**
+ * @brief Para o par de motores e redefine a posição zero.
+ */
+void paraMotorSimultaneo(AccelStepper *motor1, AccelStepper *motor2, int tipoMotor)
+{
     if ((!motor1) || (!motor2)) return;
 
-    pararMotorSimultaneo = true;
+    if (tipoMotor == 1) pararMotorSimultaneo = true;
+    else if (tipoMotor == 2) pararMotorFalha = true;
 
-    // Para o motor instantaneamente definindo velocidade zero
     motor1->setSpeed(0);
     motor2->setSpeed(0);
-
     motor1->setCurrentPosition(0);
     motor2->setCurrentPosition(0);
-
-    motor1->disableOutputs(); 
+    motor1->disableOutputs();
     motor2->disableOutputs();
-
-    digitalWrite(PIN_ENABLE_1, HIGH);
-    digitalWrite(PIN_ENABLE_2, HIGH);
-
 }
 
-void paraMotor(AccelStepper* motor){
+/**
+ * @brief Interrompe imediatamente o Motor 1.
+ */
+void paraMotor1(AccelStepper *motor)
+{
     if (!motor) return;
-
-    pararMotor = true;
-
-    motor->setSpeed(0); // Para o motor imediatamente
-    motor->setCurrentPosition(0); // Redefine a posição atual do motor para
-    motor->disableOutputs(); // Desabilita as saídas do motor (desliga a energia)
-    
+    pararMotor1 = true;
+    motor->setSpeed(0);
+    motor->setCurrentPosition(0);
+    motor->disableOutputs();
 }
 
-void subsidencia(AccelStepper* motor, int velocidadeMaxima, int aceleracao, long distancia){
-    digitalWrite(PIN_ENABLE_1, HIGH);
-    motor->setMaxSpeed(velocidadeMaxima);
-    motor->setAcceleration(aceleracao);
-    motor->move(distancia);
-    
-    while(motor->distanceToGo() != 0){
-        motor->run();
+/**
+ * @brief Interrompe imediatamente o Motor 2.
+ */
+void paraMotor2(AccelStepper *motor)
+{
+    if (!motor) return;
+    pararMotor2 = true;
+    motor->setSpeed(0);
+    motor->setCurrentPosition(0);
+    motor->disableOutputs();
+}
+
+/**
+ * @brief Aciona o pino de habilitação do driver.
+ */
+void habilitarMotor(AccelStepper *motor, int enablePin)
+{
+    if (motor) digitalWrite(enablePin, HIGH);
+}
+
+/**
+ * @brief Desliga o pino de habilitação do driver.
+ */
+void desabilitarMotor(AccelStepper *motor, int enablePin)
+{
+    if (motor) digitalWrite(enablePin, LOW);
+}
+
+/**
+ * @brief Monitora sensores indutivos para interromper movimento em caso de detecção.
+ */
+void sensorIndutivo(AccelStepper *motor, int numMotor)
+{
+    int valorLido1 = analogRead(SENSOR_INDUTIVO_MOTOR_1);
+    int valorLido2 = analogRead(SENSOR_INDUTIVO_MOTOR_2);
+
+    if (numMotor == 1)
+    {
+        if (valorLido1 > limiarSensor) emMovimento1 = false;
     }
-
-    delay(50);
-
-    motor->move(-distancia);
-    while(motor->distanceToGo() != 0){
-        motor->run();
-    }
-
-    delay(50);
-    digitalWrite(PIN_ENABLE_1, LOW);
-}
-
-void habilitarMotor(AccelStepper* motor, int enablePin){
-    if(motor){
-        digitalWrite(enablePin, HIGH); // Habilita o motor
+    else
+    {
+        if (valorLido2 > limiarSensor) emMovimento2 = false;
     }
 }
 
-// Função para desabilitar um motor
-void desabilitarMotor(AccelStepper* motor, int enablePin) {
-    if (motor) {
-        digitalWrite(enablePin, LOW); // Desabilita o motor
+/**
+ * @brief Monitora sensores indutivos durante movimentos de pares de motores.
+ */
+void sensorIndutivoSimultaneo(AccelStepper *motor1, AccelStepper *motor2, int tipoMotor)
+{
+    int valorLido1 = analogRead(SENSOR_INDUTIVO_MOTOR_1);
+    int valorLido2 = analogRead(SENSOR_INDUTIVO_MOTOR_2);
+
+    if (tipoMotor == 1)
+    {
+        if (valorLido1 > limiarSensor) emMovimentoSimultaneo = false;
+    }
+    else
+    {
+        if (valorLido2 > limiarSensor) emMovimentoFalha = false;
     }
 }
-
-
-void sensorIndutivo(AccelStepper* motor) {
-    if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
-        paraMotor(motor);
-    }    
-}
-
-
-void sensorIndutivoSimultaneo(AccelStepper* motor1, AccelStepper* motor2) {
-
-    if(digitalRead(SENSOR_INDUTIVO_MOTOR_1) || digitalRead(SENSOR_INDUTIVO_MOTOR_2)) {
-        paraMotorSimultaneo(motor1, motor2);
-    }
-
-}
-
