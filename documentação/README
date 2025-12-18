@@ -1,0 +1,84 @@
+Documentação do Sistema de Atuadores LM2C
+1. Visão Geral
+O projeto consiste em um sistema de controle para até 4 motores de passo, permitindo movimentos individuais, simultâneos ou coordenados ("Universal"). O firmware é estruturado de forma modular para facilitar a manutenção e escalabilidade.
+
+2. Estrutura do Projeto
+src/main.cpp: Ponto de entrada que gerencia o fluxo principal (setup e loop) e a execução do movimento dos motores.
+
+src/verificarSerial.cpp: Responsável por receber, processar e interpretar os comandos enviados via porta serial.
+
+src/functions.cpp: Contém a lógica de controle dos motores, como criação, movimentação acelerada, uniforme e tratamentos de sensores.
+
+include/macros.h: Define as constantes, mapeamento de pinos e caracteres de comando serial.
+
+include/globals.h: Declara variáveis de estado globais (ex: flags de movimento).
+
+3. Atuação dos Motores
+O sistema utiliza a biblioteca AccelStepper para gerenciar pulsos e direção.
+
+Configuração: Os motores são inicializados com pinos de Step, Direction e Enable.
+
+Modos de Movimento:
+
+Uniforme (moverUniforme): O motor se desloca para uma posição relativa com velocidade constante.
+
+Acelerado (moverAcelerado): Implementa rampas de aceleração e desaceleração para movimentos mais suaves.
+
+Simultâneo/Falha: Controla pares de motores ao mesmo tempo (Motor 1 & 2 ou Motor 3 & 4).
+
+Universal: Movimenta os 4 motores coordenadamente através de um único comando complexo.
+
+Segurança: O sistema monitora Sensores Indutivos (Pinos A0 e A1). Se um sensor for ativado (leitura acima do limiar), o movimento é interrompido imediatamente para evitar colisões.
+
+4. Comunicação Serial (Interface LabVIEW)
+A comunicação com a interface externa (como LabVIEW ou Visual Studio) é feita via RS-232 (Serial) a uma taxa de 9600 bps.
+
+Protocolo de Mensagens
+O firmware espera mensagens no formato: [CARACTERE_COMANDO][DADOS]#. O caractere # é utilizado como terminador de string.
+
+Principais Comandos Serial (definidos em macros.h):
+
+A / a: Liga ou desliga o driver do motor selecionado (Enable/Disable).
+
+R / M: Seleciona o Motor 1 ou Motor 2 para comandos subsequentes.
+
+P[valor]: Define a quantidade de pulsos (distância).
+
+V[valor]: Define a velocidade de operação.
+
+H: Inicia movimento com velocidade constante.
+
+n: Para o motor imediatamente.
+
+T[pulsos];[vel];[dir];[mover]: Comando de configuração completa para um motor.
+
+W / L: Comandos para movimentação simultânea de pares de motores, usando separadores ; para múltiplos parâmetros.
+
+Feedback para a Interface
+O Arduino envia caracteres simples para confirmar a conclusão de tarefas:
+
+y: Movimento do Motor 1 (ou motores simultâneos 1&2) concluído.
+
+Y: Movimento do Motor 2 (ou motores de falha 3&4) concluído.
+
+5. Mapeamento de Pinos (Pinout)
+Conforme definido em macros.h, o sistema está preparado para duas configurações físicas ("Caixa Azul" e "Caixa Preta").
+
+Configuração padrão (Caixa Preta - 4 Motores):
+
+Motor 1: Step (4), Dir (2), Enable (3).
+
+Motor 2: Step (7), Dir (5), Enable (6).
+
+Motor 3: Step (10), Dir (8), Enable (9).
+
+Motor 4: Step (13), Dir (11), Enable (12).
+
+Sensores: Motor 1 (A0), Motor 2 (A1).
+
+6. Requisitos de Software
+Framework: Arduino.
+
+Plataforma: Atmel AVR (Arduino Nano/AtMega328).
+
+Biblioteca Externa: waspinator/AccelStepper@^1.64.
